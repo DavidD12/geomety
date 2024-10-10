@@ -1,0 +1,21 @@
+[package]
+name = "geomety"
+version = "0.1.0"
+edition = "2021"
+authors = ["David Doose <David.Doose@gmail.com>"]
+license = "LGPL-3.0-only"
+description = "Geom et Ty (Geomtry Et Typing)"
+repository = "https://github.com/DavidD12/geomty"
+readme = "README.md"
+keywords = ["Geometry", "Typing"]
+
+[dependencies]
+sealed = "0.3.0"
+sity = "0.2.1"
+
+[lib]
+path = "src/lib.rs"
+
+[[bin]]
+name = "main"
+path = "bin/main.rs"
