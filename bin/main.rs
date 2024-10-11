@@ -12,7 +12,27 @@ fn main() {
     println!("{}", vector);
     println!("{}", point);
 
-    let v2: Vector<_> = (10.0, 20.0).into();
-    let vector = (3.0 * vector) + v2 / 3.0;
-    println!("{}", vector.norm());
+    println!("--------------------------------------------------");
+    let v1: Vector<_> = (10.0, 20.0).into();
+    let v2 = (3.0 * vector) + v1 / 3.0;
+    println!("{}", v1);
+    println!("{}", v1.length());
+
+    println!("--------------------------------------------------");
+    let v: Vector<_> = (x, y).into();
+    println!("{}", v);
+    let v = v / v;
+
+    println!("--------------------------------------------------");
+    let v: Vector<_> = (SI::m(10.0), SI::m(20.0)).into();
+    println!("{}", v);
+    println!("{}", v.length());
+
+    let v: Vector<_> = (10.0, 20.0).into();
+    println!("{}", v);
+    println!("{}", v.normalize());
+    //
+    let v: Vector<_> = (SI::m(10.0), SI::m(20.0)).into();
+    println!("{}", v);
+    println!("{}", v.normalize());
 }

@@ -11,7 +11,8 @@ keywords = ["Geometry", "Typing"]
 
 [dependencies]
 sealed = "0.3.0"
-sity = "0.2.1"
+# sity = "0.2.1"
+sity = { path = "../sity" }
 
 [lib]
 path = "src/lib.rs"
