@@ -17,6 +17,17 @@ impl<T: Number, P: Prefix> Point<T, P> {
     }
 }
 
+//-------------------------------------------------- Default --------------------------------------------------
+
+impl<T: Number, P: Prefix> Default for Point<T, P> {
+    fn default() -> Self {
+        Self {
+            x: Default::default(),
+            y: Default::default(),
+        }
+    }
+}
+
 //-------------------------------------------------- Translate --------------------------------------------------
 
 impl<T, P> Point<T, P>
@@ -96,22 +107,16 @@ where
 
 //-------------------------------------------------- Distance --------------------------------------------------
 
-impl<T, P> Point<T, P>
+impl<T, P> Distance<T, P, Self> for Point<T, P>
 where
-    T: Copy + Add<Output = T> + Sub<Output = T> + Pow2<Output = T> + Root2<Output = T>,
+    T: Number + Add<Output = T> + Sub<Output = T> + Pow2<Output = T> + Root2<Output = T>,
     P: Prefix,
 {
-    pub fn distance(&self, other: Self) -> Metre_<T, P> {
+    fn distance(&self, other: &Self) -> Metre_<T, P> {
         ((other.x - self.x).pow2() + (other.y - self.y).pow2()).root2()
     }
-}
 
-impl<T, P> Point<T, P>
-where
-    T: Number + Add<Output = T> + Sub<Output = T> + Pow2<Output = T>,
-    P: Prefix,
-{
-    pub fn distance2(&self, other: Self) -> Metre2_<T, P> {
+    fn distance2(&self, other: &Self) -> Metre2_<T, P> {
         (other.x - self.x).pow2() + (other.y - self.y).pow2()
     }
 }

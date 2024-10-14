@@ -3,7 +3,7 @@ use sity::*;
 use std::fmt::Display;
 use std::ops::{Add, Div, Mul, Sub};
 
-#[derive(Debug, Clone, Copy, PartialEq)]
+#[derive(Debug, Clone, Copy, PartialEq, Default)]
 pub struct Line<T: Number, P: Prefix> {
     pub point: Point<T, P>,
     pub vector: Vector<Metre_<T, P>>,
@@ -91,6 +91,32 @@ where
             point: self.point / rhs,
             vector: self.vector,
         }
+    }
+}
+
+//-------------------------------------------------- To Vector --------------------------------------------------
+
+impl<T, P> ToVector<Metre_<T, P>> for Line<T, P>
+where
+    T: Number,
+    P: Prefix,
+{
+    fn to_vector(&self) -> Vector<Metre_<T, P>> {
+        self.vector
+    }
+}
+
+//-------------------------------------------------- Parallel --------------------------------------------------
+
+impl<T, P> Line<T, P>
+where
+    T: Number,
+    P: Prefix,
+    <Metre_<T, P> as HasValue>::Output: Sub<Output = <Metre_<T, P> as HasValue>::Output>
+        + Mul<Output = <Metre_<T, P> as HasValue>::Output>,
+{
+    pub fn is_parallel<U: ToVector<Metre_<T, P>>>(&self, other: &U) -> bool {
+        is_parallel(self, other)
     }
 }
 

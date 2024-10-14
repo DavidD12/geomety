@@ -1,29 +1,57 @@
+use super::*;
 use std::fmt::Display;
 use std::ops::{Add, Div, Mul, Sub};
-use std::process::Output;
 
 use sity::*;
 
-#[derive(Debug, Clone, Copy, PartialEq)]
-pub struct Vector<T: Number> {
+#[derive(Debug, Clone, Copy, PartialEq, Default)]
+pub struct Vector<T>
+where
+    T: Number,
+{
     pub dx: T,
     pub dy: T,
 }
 
 //-------------------------------------------------- New --------------------------------------------------
 
-impl<T: Number> Vector<T> {
+impl<T> Vector<T>
+where
+    T: Number,
+{
     pub fn new(dx: T, dy: T) -> Self {
         Self { dx, dy }
     }
 }
 
-impl<T: Number> Default for Vector<T> {
-    fn default() -> Self {
-        Self {
-            dx: T::ZERO,
-            dy: T::ZERO,
-        }
+//-------------------------------------------------- From/Into --------------------------------------------------
+
+impl<T: Number> From<(T, T)> for Vector<T> {
+    fn from(value: (T, T)) -> Self {
+        Vector::new(value.0, value.1)
+    }
+}
+
+impl<T: Number> Into<(T, T)> for Vector<T> {
+    fn into(self) -> (T, T) {
+        (self.dx, self.dy)
+    }
+}
+
+impl<T: Number> Into<(T, T)> for &Vector<T> {
+    fn into(self) -> (T, T) {
+        (self.dx, self.dy)
+    }
+}
+
+//-------------------------------------------------- ToValue --------------------------------------------------
+
+impl<T> Vector<T>
+where
+    T: Number + HasValue,
+{
+    pub fn to_value(&self) -> Vector<<T as HasValue>::Output> {
+        Vector::new(self.dx.value(), self.dy.value())
     }
 }
 
@@ -137,17 +165,6 @@ where
     }
 }
 
-//-------------------------------------------------- ToValue --------------------------------------------------
-
-impl<T> Vector<T>
-where
-    T: Number + HasValue,
-{
-    pub fn to_value(&self) -> Vector<<T as HasValue>::Output> {
-        Vector::new(self.dx.value(), self.dy.value())
-    }
-}
-
 //-------------------------------------------------- Length --------------------------------------------------
 
 impl<T> Vector<T>
@@ -214,25 +231,92 @@ where
     }
 }
 
-//-------------------------------------------------- From/Into --------------------------------------------------
+//-------------------------------------------------- ToVector --------------------------------------------------
 
-impl<T: Number> From<(T, T)> for Vector<T> {
-    fn from(value: (T, T)) -> Self {
-        Vector::new(value.0, value.1)
+impl<T> ToVector<T> for Vector<T>
+where
+    T: Number,
+{
+    fn to_vector(&self) -> Vector<T> {
+        *self
     }
 }
 
-impl<T: Number> Into<(T, T)> for Vector<T> {
-    fn into(self) -> (T, T) {
-        (self.dx, self.dy)
+//-------------------------------------------------- Parallel --------------------------------------------------
+
+impl<T> Vector<T>
+where
+    T: Number,
+    <T as HasValue>::Output:
+        Sub<Output = <T as HasValue>::Output> + Mul<Output = <T as HasValue>::Output>,
+{
+    pub fn is_parallel<U: ToVector<T>>(&self, other: &U) -> bool {
+        is_parallel(self, other)
     }
 }
 
-impl<T: Number> Into<(T, T)> for &Vector<T> {
-    fn into(self) -> (T, T) {
-        (self.dx, self.dy)
-    }
-}
+// impl<T, U> Parallel<U> for Vector<T>
+// where
+//     T: Number,
+//     U: ToVector<T>,
+//     <T as HasValue>::Output:
+//         Sub<Output = <T as HasValue>::Output> + Mul<Output = <T as HasValue>::Output>,
+// {
+//     fn is_parallel(&self, other: U) -> bool {
+//         let v = other.to_vector();
+//         self.to_value().cross_product(v.to_value()).abs() <= <T as HasValue>::Output::EPSILON
+//     }
+// }
+
+// impl<T, P> Parallel<Line<T, P>> for Vector<Metre_<T, P>>
+// where
+//     T: Number + Sub<Output = T> + Mul<Output = T>,
+//     P: Prefix,
+// {
+//     fn is_parallel(&self, other: Line<T, P>) -> bool {
+//         self.is_parallel(other.vector)
+//     }
+// }
+
+// impl<T, P> Parallel<Segment<T, P>> for Vector<Metre_<T, P>>
+// where
+//     T: Number + Sub<Output = T> + Mul<Output = T>,
+//     P: Prefix,
+// {
+//     fn is_parallel(&self, other: Segment<T, P>) -> bool {
+//         self.is_parallel(other.to_vector())
+//     }
+// }
+
+// --------------------------------------------------
+// TODO: ajouter les suivantes ?
+// Est-ce semantiquement correct ?
+// --------------------------------------------------
+
+// impl<T, P> Parallel<Line<T, P>> for Vector<T>
+// where
+//     T: Number + Sub<Output = T> + Mul<Output = T>,
+//     P: Prefix,
+// {
+//     fn is_parallel(&self, other: Line<T, P>) -> bool {
+//         let v = other.vector.to_value();
+//         self.is_parallel(v)
+//     }
+// }
+
+// impl<P, U> Parallel<Line<<U as HasValue>::Output, P>> for Vector<U>
+// where
+//     <U as HasValue>::Output:
+//         Number + Sub<Output = <U as HasValue>::Output> + Mul<Output = <U as HasValue>::Output>,
+//     U: Number,
+//     P: Prefix,
+// {
+//     fn is_parallel(&self, other: Line<<U as HasValue>::Output, P>) -> bool {
+//         let ov = other.vector.to_value();
+//         let sv = self.to_value();
+//         sv.is_parallel(ov)
+//     }
+// }
 
 //-------------------------------------------------- Display --------------------------------------------------
 

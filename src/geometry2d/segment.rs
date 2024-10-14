@@ -3,7 +3,7 @@ use sity::*;
 use std::fmt::Display;
 use std::ops::{Add, Div, Mul, Sub};
 
-#[derive(Debug, Clone, Copy, PartialEq)]
+#[derive(Debug, Clone, Copy, PartialEq, Default)]
 pub struct Segment<T: Number, P: Prefix> {
     pub points: (Point<T, P>, Point<T, P>),
 }
@@ -101,12 +101,12 @@ where
 
 //-------------------------------------------------- ToVector --------------------------------------------------
 
-impl<T, P> Segment<T, P>
+impl<T, P> ToVector<Metre_<T, P>> for Segment<T, P>
 where
     T: Number + Sub<Output = T>,
     P: Prefix,
 {
-    pub fn to_vector(&self) -> Vector<Metre_<T, P>> {
+    fn to_vector(&self) -> Vector<Metre_<T, P>> {
         let dx = self.points.1.x - self.points.0.x;
         let dy = self.points.1.y - self.points.0.y;
         Vector::new(dx, dy)
@@ -137,5 +137,27 @@ where
 {
     pub fn length(self) -> <<<Metre_<T, P> as Pow2>::Output as Add>::Output as Root2>::Output {
         self.to_vector().length()
+    }
+}
+
+//-------------------------------------------------- Parallel --------------------------------------------------
+
+impl<T, P> Segment<T, P>
+where
+    T: Number,
+    P: Prefix,
+    <Metre_<T, P> as HasValue>::Output: Sub<Output = <Metre_<T, P> as HasValue>::Output>
+        + Mul<Output = <Metre_<T, P> as HasValue>::Output>,
+{
+    pub fn is_parallel<U: ToVector<Metre_<T, P>>>(&self, other: &U) -> bool {
+        is_parallel(self, other)
+    }
+}
+
+//-------------------------------------------------- Display --------------------------------------------------
+
+impl<T: Number + Display, P: Prefix> Display for Segment<T, P> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "Segment({}, {})", self.first(), self.second())
     }
 }
