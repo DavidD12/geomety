@@ -3,21 +3,21 @@ use std::ops::{Add, Div, Mul, Sub};
 
 //-------------------------------------------------- Vector --------------------------------------------------
 
-impl Add<Vector<f64>> for f64 {
-    type Output = Vector<f64>;
+// impl Add<Vector<f64>> for f64 {
+//     type Output = Vector<f64>;
 
-    fn add(self, rhs: Vector<f64>) -> Self::Output {
-        Vector::new(self + rhs.dx, self + rhs.dy)
-    }
-}
+//     fn add(self, rhs: Vector<f64>) -> Self::Output {
+//         Vector::new(self + rhs.dx, self + rhs.dy)
+//     }
+// }
 
-impl Sub<Vector<f64>> for f64 {
-    type Output = Vector<f64>;
+// impl Sub<Vector<f64>> for f64 {
+//     type Output = Vector<f64>;
 
-    fn sub(self, rhs: Vector<f64>) -> Self::Output {
-        Vector::new(self - rhs.dx, self - rhs.dy)
-    }
-}
+//     fn sub(self, rhs: Vector<f64>) -> Self::Output {
+//         Vector::new(self - rhs.dx, self - rhs.dy)
+//     }
+// }
 
 impl Mul<Vector<f64>> for f64 {
     type Output = Vector<f64>;
