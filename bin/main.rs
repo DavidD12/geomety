@@ -1,6 +1,5 @@
 use geometry2d::*;
 use geomety::*;
-use sity::SI;
 
 fn main() {
     let p1 = Point::new(1.0, 2.0);
@@ -15,18 +14,18 @@ fn main() {
         None => println!("no intersection"),
     };
 
-    println!("--------------------------------------------------");
-    let p1 = Point::new(SI::m(1.0), SI::m(2.0));
-    let v1 = Vector::new(SI::m(3.0), SI::m(4.0));
-    let l1 = Line::new(p1, v1);
-    let p2 = Point::new(SI::m(2.0), SI::m(3.0));
-    let v2 = Vector::new(SI::m(-1.0), SI::m(2.0));
-    let l2 = Line::new(p2, v2);
+    // println!("--------------------------------------------------");
+    // let p1 = Point::new(SI::m(1.0), SI::m(2.0));
+    // let v1 = Vector::new(SI::m(3.0), SI::m(4.0));
+    // let l1 = Line::new(p1, v1);
+    // let p2 = Point::new(SI::m(2.0), SI::m(3.0));
+    // let v2 = Vector::new(SI::m(-1.0), SI::m(2.0));
+    // let l2 = Line::new(p2, v2);
 
-    match l1.intersection(&l2) {
-        Some(pt) => println!("{}", pt),
-        None => println!("no intersection"),
-    };
+    // match l1.intersection(&l2) {
+    //     Some(pt) => println!("{}", pt),
+    //     None => println!("no intersection"),
+    // };
 
     // println!("--------------------------------------------------");
 

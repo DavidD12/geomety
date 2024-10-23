@@ -10,6 +10,7 @@ readme = "README.md"
 keywords = ["Geometry", "Typing"]
 
 [dependencies]
+assert_approx_eq = "1.1.0"
 sealed = "0.3.0"
 # sity = "0.2.1"
 sity = { path = "../sity" }

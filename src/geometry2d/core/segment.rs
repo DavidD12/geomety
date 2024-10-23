@@ -36,7 +36,7 @@ impl<T: Number> From<(Point<T>, Point<T>)> for Segment<T> {
 
 impl<T> Segment<T>
 where
-    T: Number + HasValue,
+    T: Number,
 {
     pub fn to_value(&self) -> Segment<<T as HasValue>::Output> {
         Segment::new(self.points.0.to_value(), self.points.1.to_value())
@@ -47,7 +47,7 @@ where
 
 impl<T> ToVector<T> for Segment<T>
 where
-    T: Number + Sub<Output = T>,
+    T: Number,
 {
     fn to_vector(&self) -> Vector<T> {
         let dx = self.points.1.x - self.points.0.x;
@@ -60,7 +60,7 @@ where
 
 impl<T> Add<T> for Segment<T>
 where
-    T: Number + Add<Output = T>,
+    T: Number,
 {
     type Output = Self;
 
@@ -71,7 +71,7 @@ where
 
 impl<T> Sub<T> for Segment<T>
 where
-    T: Number + Sub<Output = T>,
+    T: Number,
 {
     type Output = Self;
 
@@ -108,7 +108,7 @@ where
 
 impl<T> Add<Vector<T>> for Segment<T>
 where
-    T: Number + Add<Output = T>,
+    T: Number,
 {
     type Output = Self;
 
@@ -119,7 +119,7 @@ where
 
 impl<T> Sub<Vector<T>> for Segment<T>
 where
-    T: Number + Sub<Output = T>,
+    T: Number,
 {
     type Output = Self;
 
@@ -160,7 +160,7 @@ where
 
 impl<T> Segment<T>
 where
-    T: Number + Add<Output = T>,
+    T: Number,
 {
     pub fn translate(&self, dx: T, dy: T) -> Self {
         Self::new(
@@ -175,9 +175,8 @@ where
 impl<T> Segment<T>
 where
     T: Number,
-    T: Sub<Output = T>,
     T: Pow2,
-    <T as Pow2>::Output: Add<Output = <T as Pow2>::Output>,
+    <T as Pow2>::Output: Number,
 {
     pub fn norm2(self) -> <T as Pow2>::Output {
         self.points.0.distance2(&self.points.1)
@@ -187,9 +186,8 @@ where
 impl<T> Segment<T>
 where
     T: Number,
-    T: Sub<Output = T>,
     T: Pow2,
-    <T as Pow2>::Output: Add<Output = <T as Pow2>::Output>,
+    <T as Pow2>::Output: Number,
     <T as Pow2>::Output: Root2<Output = T>,
 {
     pub fn norm(self) -> T {
@@ -202,16 +200,12 @@ where
 impl<T> Distance<T, Point<T>> for Segment<T>
 where
     T: Number,
-    // to vector
-    T: Sub<Output = T>,
-    // Line distance
     T: Mul,
-    <T as Mul>::Output: Sub,
+    <T as Mul>::Output: Number,
     T: Pow2,
-    <T as Pow2>::Output: Add<Output = <T as Pow2>::Output>,
+    T: Pow2<Output = <T as Mul>::Output>,
     <T as Pow2>::Output: Root2<Output = T>,
-    <<T as Mul>::Output as Sub>::Output: Number,
-    <<T as Mul>::Output as Sub>::Output: Div<T, Output = T>,
+    <T as Mul>::Output: Div<T, Output = T>,
 {
     fn distance(&self, other: &Point<T>) -> T {
         other.distance(self)
@@ -223,12 +217,8 @@ where
 impl<T> IsParallel<Segment<T>> for Segment<T>
 where
     T: Number,
-    // to_vector
-    T: Sub<Output = T>,
-    // vector is_parallel
     T: Mul,
-    <T as Mul>::Output: Sub,
-    <<T as Mul>::Output as Sub>::Output: Number,
+    <T as Mul>::Output: Number,
 {
     fn is_parallel(&self, other: &Segment<T>) -> bool {
         let v1 = self.to_vector();
@@ -240,12 +230,8 @@ where
 impl<T> IsParallel<Line<T>> for Segment<T>
 where
     T: Number,
-    // to_vector
-    T: Sub<Output = T>,
-    // vector is_parallel
     T: Mul,
-    <T as Mul>::Output: Sub,
-    <<T as Mul>::Output as Sub>::Output: Number,
+    <T as Mul>::Output: Number,
 {
     fn is_parallel(&self, other: &Line<T>) -> bool {
         other.is_parallel(self)
@@ -257,22 +243,48 @@ where
 impl<T> Intersection<T, Line<T>> for Segment<T>
 where
     T: Number,
-    // to_vector
-    T: Sub<Output = T>,
-    // vector is_parallel
     T: Mul,
-    <T as Mul>::Output: Sub,
-    <<T as Mul>::Output as Sub>::Output: Number,
-    // /
-    <<T as Mul>::Output as Sub>::Output: Div,
-    // *
-    Vector<T>: Mul<<<<T as Mul>::Output as Sub>::Output as Div>::Output, Output = Vector<T>>,
-    <<<T as Mul>::Output as Sub>::Output as Div>::Output: Number,
-    // +
-    T: Add<Output = T>,
+    <T as Mul>::Output: Number,
+    <T as Mul>::Output: Div,
+    <<T as Mul>::Output as Div>::Output: Number,
+    T: Mul<<<T as Mul>::Output as Div>::Output, Output = T>,
 {
     fn intersection(&self, other: &Line<T>) -> Option<Point<T>> {
         other.intersection(self)
+    }
+}
+
+impl<T> Intersection<T, Segment<T>> for Segment<T>
+where
+    T: Number,
+    T: Mul,
+    <T as Mul>::Output: Number,
+    <T as Mul>::Output: Div,
+    <<T as Mul>::Output as Div>::Output: Number,
+    T: Mul<<<T as Mul>::Output as Div>::Output, Output = T>,
+{
+    fn intersection(&self, other: &Segment<T>) -> Option<Point<T>> {
+        let self_v = self.to_vector();
+        let other_v = other.to_vector();
+        let den = self_v.cross_product(&other_v);
+        if den.abs() <= <<T as Mul>::Output as Sub>::Output::EPSILON {
+            None
+        } else {
+            let v: Vector<_> = (&self.first(), &other.first()).into();
+            let t = v.cross_product(&other_v) / den;
+            let u = v.cross_product(&self_v) / den;
+            if u >= <<T as Mul>::Output as Div>::Output::ZERO
+                && u <= <<T as Mul>::Output as Div>::Output::ONE
+                && t >= <<T as Mul>::Output as Div>::Output::ZERO
+                && t <= <<T as Mul>::Output as Div>::Output::ONE
+            {
+                let delta = self_v * t;
+                let x = self.first() + delta;
+                Some(x)
+            } else {
+                None
+            }
+        }
     }
 }
 

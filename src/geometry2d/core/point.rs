@@ -29,7 +29,7 @@ impl<T: Number> From<(T, T)> for Point<T> {
 
 impl<T> Point<T>
 where
-    T: Number + HasValue,
+    T: Number,
 {
     pub fn to_value(&self) -> Point<<T as HasValue>::Output> {
         Point::new(self.x.value(), self.y.value())
@@ -40,7 +40,7 @@ where
 
 impl<T> Add<T> for Point<T>
 where
-    T: Number + Add<Output = T>,
+    T: Number,
 {
     type Output = Self;
 
@@ -54,7 +54,7 @@ where
 
 impl<T> Sub<T> for Point<T>
 where
-    T: Number + Sub<Output = T>,
+    T: Number,
 {
     type Output = Self;
 
@@ -96,7 +96,7 @@ where
 
 impl<T> Add<Vector<T>> for Point<T>
 where
-    T: Number + Add<Output = T>,
+    T: Number,
 {
     type Output = Self;
 
@@ -107,7 +107,7 @@ where
 
 impl<T> Sub<Vector<T>> for Point<T>
 where
-    T: Number + Sub<Output = T>,
+    T: Number,
 {
     type Output = Self;
 
@@ -148,7 +148,7 @@ where
 
 impl<T> Point<T>
 where
-    T: Number + Add<Output = T>,
+    T: Number,
 {
     pub fn translate(&self, dx: T, dy: T) -> Self {
         Self {
@@ -163,9 +163,8 @@ where
 impl<T> Point<T>
 where
     T: Number,
-    T: Sub<Output = T>,
     T: Pow2,
-    <T as Pow2>::Output: Add<Output = <T as Pow2>::Output>,
+    <T as Pow2>::Output: Number,
 {
     pub fn distance2(&self, other: &Self) -> <T as Pow2>::Output {
         (other.x - self.x).pow2() + (other.y - self.y).pow2()
@@ -177,9 +176,8 @@ where
 impl<T> Distance<T, Point<T>> for Point<T>
 where
     T: Number,
-    T: Sub<Output = T>,
     T: Pow2,
-    <T as Pow2>::Output: Add<Output = <T as Pow2>::Output>,
+    <T as Pow2>::Output: Number,
     <T as Pow2>::Output: Root2<Output = T>,
 {
     fn distance(&self, other: &Self) -> T {
@@ -190,19 +188,12 @@ where
 impl<T> Distance<T, Line<T>> for Point<T>
 where
     T: Number,
-    // into
-    T: Sub<T, Output = T>,
-    // corss product
     T: Mul,
-    <T as Mul>::Output: Sub,
-    // Length
+    <T as Mul>::Output: Number,
     T: Pow2,
-    <T as Pow2>::Output: Add<Output = <T as Pow2>::Output>,
+    <T as Pow2>::Output: Number,
     <T as Pow2>::Output: Root2<Output = T>,
-    // abs
-    <<T as Mul>::Output as Sub>::Output: Number,
-    // /
-    <<T as Mul>::Output as Sub>::Output: Div<T, Output = T>,
+    <T as Mul>::Output: Div<T, Output = T>,
 {
     fn distance(&self, other: &Line<T>) -> T {
         let w: Vector<_> = (self, &other.point).into();
@@ -216,24 +207,66 @@ where
 impl<T> Distance<T, Segment<T>> for Point<T>
 where
     T: Number,
-    // to vector
-    T: Sub<Output = T>,
-    // Line distance
     T: Mul,
-    <T as Mul>::Output: Sub,
+    <T as Mul>::Output: Number,
     T: Pow2,
-    <T as Pow2>::Output: Add<Output = <T as Pow2>::Output>,
+    T: Pow2<Output = <T as Mul>::Output>,
     <T as Pow2>::Output: Root2<Output = T>,
-    <<T as Mul>::Output as Sub>::Output: Number,
-    <<T as Mul>::Output as Sub>::Output: Div<T, Output = T>,
+    <T as Mul>::Output: Div<T, Output = T>,
 {
-    fn distance(&self, other: &Segment<T>) -> T {
-        let v = other.to_vector();
-        let line = Line::new(other.first(), v);
-        let d_line = self.distance(&line);
-        let d_first = self.distance(&other.first());
-        let d_second = self.distance(&other.second());
-        d_line.min(d_first).min(d_second)
+    fn distance(&self, _other: &Segment<T>) -> T {
+        todo!()
+    }
+}
+
+//-------------------------------------------------- Projection --------------------------------------------------
+
+impl<T> Point<T>
+where
+    T: Number,
+    T: Mul,
+    <T as Mul>::Output: Number,
+    T: Pow2<Output = <T as Mul>::Output>,
+    <T as Mul>::Output: Div,
+    <<T as Mul>::Output as Div>::Output: Number,
+    T: Mul<<<T as Mul>::Output as Div>::Output, Output = T>,
+{
+    pub fn projection_to_line(&self, other: &Line<T>) -> Point<T> {
+        let v: Vector<_> = (&other.point, self).into();
+        let dp = v.dot_product(&other.vector);
+        let n2 = other.vector.norm2();
+        let t = dp / n2;
+        let delta = other.vector * t;
+        let x = other.point + delta;
+        x
+    }
+}
+
+impl<T> Point<T>
+where
+    T: Number,
+    T: Mul,
+    <T as Mul>::Output: Number,
+    T: Pow2<Output = <T as Mul>::Output>,
+    <T as Mul>::Output: Div,
+    <<T as Mul>::Output as Div>::Output: Number,
+    T: Mul<<<T as Mul>::Output as Div>::Output, Output = T>,
+{
+    pub fn projection_to_segment(&self, other: &Segment<T>) -> Option<Point<T>> {
+        let v: Vector<_> = (&other.first(), self).into();
+        let seg_v = other.to_vector();
+        let dp = v.dot_product(&seg_v);
+        let n2 = seg_v.norm2();
+        let t = dp / n2;
+        if t >= <<T as Mul>::Output as Div>::Output::ZERO
+            && t <= <<T as Mul>::Output as Div>::Output::ONE
+        {
+            let delta = seg_v * t;
+            let x = other.first() + delta;
+            Some(x)
+        } else {
+            None
+        }
     }
 }
 

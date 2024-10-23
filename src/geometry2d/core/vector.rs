@@ -28,7 +28,7 @@ impl<T: Number> From<(T, T)> for Vector<T> {
 
 impl<T> From<(&Point<T>, &Point<T>)> for Vector<T>
 where
-    T: Number + Sub<Output = T>,
+    T: Number,
 {
     fn from(value: (&Point<T>, &Point<T>)) -> Self {
         let dx = value.1.x - value.0.x;
@@ -53,7 +53,7 @@ impl<T: Number> Into<(T, T)> for &Vector<T> {
 
 impl<T> Vector<T>
 where
-    T: Number + HasValue,
+    T: Number,
 {
     pub fn to_value(&self) -> Vector<<T as HasValue>::Output> {
         Vector::new(self.dx.value(), self.dy.value())
@@ -75,7 +75,7 @@ where
 
 impl<T> Add<T> for Vector<T>
 where
-    T: Number + Add<Output = T>,
+    T: Number,
 {
     type Output = Self;
 
@@ -89,7 +89,7 @@ where
 
 impl<T> Sub<T> for Vector<T>
 where
-    T: Number + Sub<Output = T>,
+    T: Number,
 {
     type Output = Self;
 
@@ -131,7 +131,7 @@ where
 
 impl<T> Add for Vector<T>
 where
-    T: Number + Add<Output = T>,
+    T: Number,
 {
     type Output = Self;
 
@@ -145,7 +145,7 @@ where
 
 impl<T> Sub for Vector<T>
 where
-    T: Number + Sub<Output = T>,
+    T: Number,
 {
     type Output = Self;
 
@@ -191,7 +191,7 @@ impl<T> Vector<T>
 where
     T: Number,
     T: Pow2,
-    <T as Pow2>::Output: Add<Output = <T as Pow2>::Output>,
+    <T as Pow2>::Output: Number,
 {
     pub fn norm2(&self) -> <T as Pow2>::Output {
         self.dx.pow2() + self.dy.pow2()
@@ -202,7 +202,7 @@ impl<T> Vector<T>
 where
     T: Number,
     T: Pow2,
-    <T as Pow2>::Output: Add<Output = <T as Pow2>::Output>,
+    <T as Pow2>::Output: Number,
     <T as Pow2>::Output: Root2<Output = T>,
 {
     pub fn norm(&self) -> T {
@@ -217,10 +217,8 @@ where
     T: Number,
     // length
     T: Pow2,
-    <T as Pow2>::Output: Add<Output = <T as Pow2>::Output>,
+    <T as Pow2>::Output: Number,
     <T as Pow2>::Output: Root2<Output = T>,
-    // value
-    T: HasValue,
     // /
     T: Div<<T as HasValue>::Output, Output = T>,
 {
@@ -239,7 +237,7 @@ impl<T> Vector<T>
 where
     T: Number,
     T: Mul,
-    <T as Mul>::Output: Add,
+    <T as Mul>::Output: Number,
 {
     pub fn dot_product(&self, other: &Self) -> <<T as Mul>::Output as Add>::Output {
         self.dx * other.dx + self.dy * other.dy
@@ -250,7 +248,7 @@ impl<T> Vector<T>
 where
     T: Number,
     T: Mul,
-    <T as Mul>::Output: Sub,
+    <T as Mul>::Output: Number,
 {
     pub fn cross_product(&self, other: &Self) -> <<T as Mul>::Output as Sub>::Output {
         self.dx * other.dy - self.dy * other.dx
@@ -264,9 +262,7 @@ where
     T: Number,
     // cros product
     T: Mul,
-    <T as Mul>::Output: Sub,
-    // abs
-    <<T as Mul>::Output as Sub>::Output: Number,
+    <T as Mul>::Output: Number,
 {
     fn is_parallel(&self, other: &Vector<T>) -> bool {
         self.cross_product(other).abs() <= <<T as Mul>::Output as Sub>::Output::EPSILON
