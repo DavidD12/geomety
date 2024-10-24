@@ -170,14 +170,11 @@ where
 impl<T> Distance<T, Point<T>> for Line<T>
 where
     T: Number,
-    // corss product
     T: Mul,
     <T as Mul>::Output: Number,
-    // Length
     T: Pow2,
     <T as Pow2>::Output: Number,
     <T as Pow2>::Output: Root2<Output = T>,
-    // /
     <T as Mul>::Output: Div<T, Output = T>,
 {
     fn distance(&self, other: &Point<T>) -> T {
@@ -188,10 +185,8 @@ where
 impl<T> Distance<T, Line<T>> for Line<T>
 where
     T: Number,
-    // is_parallel
     T: Mul,
     <T as Mul>::Output: Number,
-    // distance
     T: Pow2,
     <T as Pow2>::Output: Number,
     <T as Pow2>::Output: Root2<Output = T>,
@@ -202,6 +197,29 @@ where
             self.point.distance(other)
         } else {
             T::ZERO
+        }
+    }
+}
+
+impl<T> Distance<T, Segment<T>> for Line<T>
+where
+    T: Number,
+    T: Mul,
+    <T as Mul>::Output: Number,
+    <T as Mul>::Output: Div,
+    <<T as Mul>::Output as Div>::Output: Number,
+    T: Mul<<<T as Mul>::Output as Div>::Output, Output = T>,
+    T: Pow2,
+    <T as Pow2>::Output: Number,
+    <T as Pow2>::Output: Root2<Output = T>,
+    <T as Mul>::Output: Div<T, Output = T>,
+{
+    fn distance(&self, other: &Segment<T>) -> T {
+        match self.intersection(other) {
+            Some(_) => T::ZERO,
+            None => self
+                .distance(other.first())
+                .min(self.distance(other.second())),
         }
     }
 }
@@ -272,7 +290,7 @@ where
         if den.abs() <= <<T as Mul>::Output as Sub>::Output::EPSILON {
             None
         } else {
-            let v: Vector<_> = (&self.point, &other.first()).into();
+            let v: Vector<_> = (&self.point, other.first()).into();
             let t = v.cross_product(&seg_v) / den;
             let u = v.cross_product(&self.vector) / den;
             if u >= <<<T as Mul>::Output as Sub>::Output as Div>::Output::ZERO

@@ -209,13 +209,33 @@ where
     T: Number,
     T: Mul,
     <T as Mul>::Output: Number,
-    T: Pow2,
     T: Pow2<Output = <T as Mul>::Output>,
     <T as Pow2>::Output: Root2<Output = T>,
-    <T as Mul>::Output: Div<T, Output = T>,
+    <T as Mul>::Output: Div,
+    <<T as Mul>::Output as Div>::Output: Number,
+    T: Mul<<<T as Mul>::Output as Div>::Output, Output = T>,
 {
-    fn distance(&self, _other: &Segment<T>) -> T {
-        todo!()
+    fn distance(&self, other: &Segment<T>) -> T {
+        // match self.projection_to_segment(other) {
+        //     Some(pt) => self.distance(&pt),
+        //     None => self
+        //         .distance(&other.first())
+        //         .min(self.distance(&other.second())),
+        // }
+        let v: Vector<_> = (other.first(), self).into();
+        let seg_v = other.to_vector();
+        let dp = v.dot_product(&seg_v);
+        let n2 = seg_v.norm2();
+        let t = dp / n2;
+        if t <= <<T as Mul>::Output as Div>::Output::ZERO {
+            return self.distance(other.first());
+        }
+        if t >= <<T as Mul>::Output as Div>::Output::ONE {
+            return self.distance(other.second());
+        }
+        let delta = seg_v * t;
+        let x = *other.first() + delta;
+        self.distance(&x)
     }
 }
 
@@ -253,7 +273,7 @@ where
     T: Mul<<<T as Mul>::Output as Div>::Output, Output = T>,
 {
     pub fn projection_to_segment(&self, other: &Segment<T>) -> Option<Point<T>> {
-        let v: Vector<_> = (&other.first(), self).into();
+        let v: Vector<_> = (other.first(), self).into();
         let seg_v = other.to_vector();
         let dp = v.dot_product(&seg_v);
         let n2 = seg_v.norm2();
@@ -262,7 +282,7 @@ where
             && t <= <<T as Mul>::Output as Div>::Output::ONE
         {
             let delta = seg_v * t;
-            let x = other.first() + delta;
+            let x = *other.first() + delta;
             Some(x)
         } else {
             None

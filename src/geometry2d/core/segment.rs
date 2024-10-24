@@ -15,12 +15,12 @@ impl<T: Number> Segment<T> {
         Self { points: (pt1, pt2) }
     }
 
-    pub fn first(&self) -> Point<T> {
-        self.points.0
+    pub fn first(&self) -> &Point<T> {
+        &self.points.0
     }
 
-    pub fn second(&self) -> Point<T> {
-        self.points.1
+    pub fn second(&self) -> &Point<T> {
+        &self.points.1
     }
 }
 
@@ -202,13 +202,55 @@ where
     T: Number,
     T: Mul,
     <T as Mul>::Output: Number,
-    T: Pow2,
+    <T as Mul>::Output: Div,
+    <<T as Mul>::Output as Div>::Output: Number,
+    T: Mul<<<T as Mul>::Output as Div>::Output, Output = T>,
     T: Pow2<Output = <T as Mul>::Output>,
     <T as Pow2>::Output: Root2<Output = T>,
-    <T as Mul>::Output: Div<T, Output = T>,
 {
     fn distance(&self, other: &Point<T>) -> T {
         other.distance(self)
+    }
+}
+
+impl<T> Distance<T, Line<T>> for Segment<T>
+where
+    T: Number,
+    T: Mul,
+    <T as Mul>::Output: Number,
+    <T as Mul>::Output: Div,
+    <T as Mul>::Output: Div<T, Output = T>,
+    <<T as Mul>::Output as Div>::Output: Number,
+    T: Mul<<<T as Mul>::Output as Div>::Output, Output = T>,
+    T: Pow2<Output = <T as Mul>::Output>,
+    <T as Pow2>::Output: Number,
+    <T as Pow2>::Output: Root2<Output = T>,
+{
+    fn distance(&self, other: &Line<T>) -> T {
+        other.distance(self)
+    }
+}
+
+impl<T> Distance<T, Segment<T>> for Segment<T>
+where
+    T: Number,
+    T: Mul,
+    <T as Mul>::Output: Number,
+    <T as Mul>::Output: Div,
+    <T as Mul>::Output: Div<T, Output = T>,
+    <<T as Mul>::Output as Div>::Output: Number,
+    T: Mul<<<T as Mul>::Output as Div>::Output, Output = T>,
+    T: Pow2<Output = <T as Mul>::Output>,
+    <T as Pow2>::Output: Number,
+    <T as Pow2>::Output: Root2<Output = T>,
+{
+    fn distance(&self, other: &Self) -> T {
+        match self.intersection(other) {
+            Some(_) => T::ZERO,
+            None => self
+                .distance(other.first())
+                .min(self.distance(other.second())),
+        }
     }
 }
 
@@ -270,7 +312,7 @@ where
         if den.abs() <= <<T as Mul>::Output as Sub>::Output::EPSILON {
             None
         } else {
-            let v: Vector<_> = (&self.first(), &other.first()).into();
+            let v: Vector<_> = (self.first(), other.first()).into();
             let t = v.cross_product(&other_v) / den;
             let u = v.cross_product(&self_v) / den;
             if u >= <<T as Mul>::Output as Div>::Output::ZERO
@@ -279,7 +321,7 @@ where
                 && t <= <<T as Mul>::Output as Div>::Output::ONE
             {
                 let delta = self_v * t;
-                let x = self.first() + delta;
+                let x = *self.first() + delta;
                 Some(x)
             } else {
                 None
