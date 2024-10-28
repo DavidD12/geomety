@@ -1,3 +1,6 @@
+pub mod orientation;
+pub use orientation::*;
+
 pub mod point;
 pub use point::*;
 
@@ -9,6 +12,12 @@ pub use line::*;
 
 pub mod segment;
 pub use segment::*;
+
+pub mod polygon;
+pub use polygon::*;
+
+pub mod circle;
+pub use circle::*;
 
 use sity::*;
 
@@ -38,6 +47,12 @@ pub trait IsParallel<O> {
 
 //------------------------- Intersection -------------------------
 
-pub trait Intersection<T: Number, O> {
-    fn intersection(&self, other: &O) -> Option<Point<T>>;
+// pub trait Intersection<T: Number, O> {
+//     fn intersection(&self, other: &O) -> Option<Point<T>>;
+// }
+
+//------------------------- Contains -------------------------
+
+pub trait Contains<O> {
+    fn contains(&self, other: &O) -> bool;
 }

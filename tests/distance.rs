@@ -51,7 +51,7 @@ mod tests {
         let v = Vector::new(1.0, 1.0);
         let line = Line::new(p, v);
         let distance = pt.distance(&line);
-        assert_approx_eq!(distance, 2.0.root2(), 1e-10);
+        assert_approx_eq!(distance, 2.0_f64.root2(), 1e-10);
     }
 
     #[test]

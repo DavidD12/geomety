@@ -215,7 +215,7 @@ where
     <T as Mul>::Output: Div<T, Output = T>,
 {
     fn distance(&self, other: &Segment<T>) -> T {
-        match self.intersection(other) {
+        match self.intersection_to_segment(other) {
             Some(_) => T::ZERO,
             None => self
                 .distance(other.first())
@@ -251,7 +251,7 @@ where
 
 //-------------------------------------------------- Intersection --------------------------------------------------
 
-impl<T> Intersection<T, Self> for Line<T>
+impl<T> Line<T>
 where
     T: Number,
     T: Mul,
@@ -260,7 +260,7 @@ where
     <<T as Mul>::Output as Div>::Output: Number,
     T: Mul<<<T as Mul>::Output as Div>::Output, Output = T>,
 {
-    fn intersection(&self, other: &Self) -> Option<Point<T>> {
+    pub fn intersection(&self, other: &Self) -> Option<Point<T>> {
         let den = self.vector.cross_product(&other.vector);
         if den.abs() <= <<T as Mul>::Output as Sub>::Output::EPSILON {
             None
@@ -275,7 +275,7 @@ where
     }
 }
 
-impl<T> Intersection<T, Segment<T>> for Line<T>
+impl<T> Line<T>
 where
     T: Number,
     T: Mul,
@@ -284,7 +284,7 @@ where
     <<T as Mul>::Output as Div>::Output: Number,
     T: Mul<<<T as Mul>::Output as Div>::Output, Output = T>,
 {
-    fn intersection(&self, other: &Segment<T>) -> Option<Point<T>> {
+    pub fn intersection_to_segment(&self, other: &Segment<T>) -> Option<Point<T>> {
         let seg_v = other.to_vector();
         let den = self.vector.cross_product(&seg_v);
         if den.abs() <= <<T as Mul>::Output as Sub>::Output::EPSILON {
@@ -303,6 +303,24 @@ where
                 None
             }
         }
+    }
+}
+
+impl<T> Line<T>
+where
+    T: Number,
+    T: Mul,
+    <T as Mul>::Output: Number,
+    <T as Mul>::Output: Div,
+    <<T as Mul>::Output as Div>::Output: Number,
+    T: Mul<<<T as Mul>::Output as Div>::Output, Output = T>,
+{
+    pub fn intersection_to_polygon(&self, other: &Polygon<T>) -> Vec<Point<T>> {
+        other
+            .segments()
+            .iter()
+            .filter_map(|seg| self.intersection_to_segment(seg))
+            .collect()
     }
 }
 

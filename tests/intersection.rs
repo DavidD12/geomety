@@ -26,8 +26,8 @@ mod tests {
         let opt = l1.intersection(&l2);
         assert_eq!(opt.is_some(), true);
         let pt = opt.unwrap();
-        assert_approx_eq!(pt.x, 0.0, 1e-10);
-        assert_approx_eq!(pt.y, 0.0, 1e-10);
+        assert_approx_eq!(pt.x, 0.0_f64, 1e-10);
+        assert_approx_eq!(pt.y, 0.0_f64, 1e-10);
     }
 
     #[test]
@@ -50,11 +50,11 @@ mod tests {
         let p1 = Point::new(-10.0, 4.0);
         let p2 = Point::new(10.0, -4.0);
         let s = Segment::new(p1, p2);
-        let opt = l.intersection(&s);
+        let opt = l.intersection_to_segment(&s);
         assert_eq!(opt.is_some(), true);
         let pt = opt.unwrap();
-        assert_approx_eq!(pt.x, 0.0, 1e-10);
-        assert_approx_eq!(pt.y, 0.0, 1e-10);
+        assert_approx_eq!(pt.x, 0.0_f64, 1e-10);
+        assert_approx_eq!(pt.y, 0.0_f64, 1e-10);
     }
 
     #[test]
@@ -65,7 +65,7 @@ mod tests {
         let p1 = Point::new(-10.0, 4.0);
         let p2 = Point::new(5.0, 5.0);
         let s = Segment::new(p1, p2);
-        let opt = l.intersection(&s);
+        let opt = l.intersection_to_segment(&s);
         assert_eq!(opt.is_some(), false);
     }
 
@@ -77,7 +77,7 @@ mod tests {
         let p1 = Point::new(-10.0, 4.0);
         let p2 = Point::new(-5.0, 2.0);
         let s = Segment::new(p1, p2);
-        let opt = l.intersection(&s);
+        let opt = l.intersection_to_segment(&s);
         assert_eq!(opt.is_some(), false);
     }
 
@@ -104,7 +104,7 @@ mod tests {
         let opt = s1.intersection(&s2);
         assert_eq!(opt.is_some(), true);
         let pt = opt.unwrap();
-        assert_approx_eq!(pt.x, 0.0, 1e-10);
-        assert_approx_eq!(pt.y, 0.0, 1e-10);
+        assert_approx_eq!(pt.x, 0.0_f64, 1e-10);
+        assert_approx_eq!(pt.y, 0.0_f64, 1e-10);
     }
 }

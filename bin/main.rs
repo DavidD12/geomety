@@ -1,18 +1,26 @@
 use geometry2d::*;
 use geomety::*;
+use sity::*;
 
 fn main() {
-    let p1 = Point::new(1.0, 2.0);
-    let v1 = Vector::new(3.0, 4.0);
-    let l1 = Line::new(p1, v1);
-    let p2 = Point::new(2.0, 3.0);
-    let v2 = Vector::new(-1.0, 2.0);
-    let l2 = Line::new(p2, v2);
+    let p1 = Point::new(1.0, 3.0);
+    let p2 = Point::new(1.0, 1.0);
+    // let p1 = Position::new(metre(1.0), metre(3.0));
+    // let p2 = Position::new(metre(1.0), metre(1.0));
+    let a = p1.angle(&p2);
+    println!("{}", a);
 
-    match l1.intersection(&l2) {
-        Some(pt) => println!("{}", pt),
-        None => println!("no intersection"),
-    };
+    // let p1 = Point::new(1.0, 2.0);
+    // let v1 = Vector::new(3.0, 4.0);
+    // let l1 = Line::new(p1, v1);
+    // let p2 = Point::new(2.0, 3.0);
+    // let v2 = Vector::new(-1.0, 2.0);
+    // let l2 = Line::new(p2, v2);
+
+    // match l1.intersection(&l2) {
+    //     Some(pt) => println!("{}", pt),
+    //     None => println!("no intersection"),
+    // };
 
     // println!("--------------------------------------------------");
     // let p1 = Point::new(SI::m(1.0), SI::m(2.0));

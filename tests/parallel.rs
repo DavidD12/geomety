@@ -1,7 +1,6 @@
 #[cfg(test)]
 mod tests {
     use geomety::geometry2d::*;
-    use sity::*;
 
     #[test]
     fn test_parallel_vector_0() {

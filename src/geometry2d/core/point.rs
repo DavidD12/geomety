@@ -239,6 +239,48 @@ where
     }
 }
 
+impl<T> Distance<T, Polygon<T>> for Point<T>
+where
+    T: Number,
+    T: Mul,
+    <T as Mul>::Output: Number,
+    T: Pow2<Output = <T as Mul>::Output>,
+    <T as Pow2>::Output: Root2<Output = T>,
+    <T as Mul>::Output: Div,
+    <<T as Mul>::Output as Div>::Output: Number,
+    T: Mul<<<T as Mul>::Output as Div>::Output, Output = T>,
+{
+    fn distance(&self, other: &Polygon<T>) -> T {
+        if let Some((first, others)) = other.segments().split_first() {
+            let mut dst = self.distance(first);
+            for seg in others {
+                let d = self.distance(seg);
+                if d < dst {
+                    dst = d;
+                }
+            }
+            dst
+        } else {
+            T::ZERO
+        }
+    }
+}
+
+impl<T> Distance<T, Circle<T>> for Point<T>
+where
+    T: Number,
+    T: Mul,
+    <T as Mul>::Output: Number,
+    T: Pow2,
+    <T as Pow2>::Output: Number,
+    <T as Pow2>::Output: Root2<Output = T>,
+    <T as Mul>::Output: Div<T, Output = T>,
+{
+    fn distance(&self, other: &Circle<T>) -> T {
+        (self.distance(&other.center) - other.radius).max(T::ZERO)
+    }
+}
+
 //-------------------------------------------------- Projection --------------------------------------------------
 
 impl<T> Point<T>
@@ -287,6 +329,17 @@ where
         } else {
             None
         }
+    }
+}
+
+//-------------------------------------------------- Angle --------------------------------------------------
+
+impl<T> Point<T>
+where
+    T: Number + AngleFactory,
+{
+    pub fn angle(&self, other: &Self) -> Radian<<T as HasValue>::Output> {
+        (other.y - self.y).atan2(other.x - self.x)
     }
 }
 

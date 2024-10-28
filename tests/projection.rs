@@ -10,8 +10,8 @@ mod tests {
         let l = Line::new(p, v);
         let pt = Point::new(1.0, 0.0);
         let pt = pt.projection_to_line(&l);
-        assert_approx_eq!(pt.x, 1.0, 1e-10);
-        assert_approx_eq!(pt.y, 0.0, 1e-10);
+        assert_approx_eq!(pt.x, 1.0_f64, 1e-10);
+        assert_approx_eq!(pt.y, 0.0_f64, 1e-10);
     }
 
     #[test]
@@ -21,8 +21,8 @@ mod tests {
         let l = Line::new(p, v);
         let pt = Point::new(0.0, 0.0);
         let pt = pt.projection_to_line(&l);
-        assert_approx_eq!(pt.x, 1.0, 1e-10);
-        assert_approx_eq!(pt.y, 0.0, 1e-10);
+        assert_approx_eq!(pt.x, 1.0_f64, 1e-10);
+        assert_approx_eq!(pt.y, 0.0_f64, 1e-10);
     }
 
     #[test]
@@ -34,8 +34,8 @@ mod tests {
         let opt = pt.projection_to_segment(&s);
         assert_eq!(opt.is_some(), true);
         let pt = opt.unwrap();
-        assert_approx_eq!(pt.x, 1.0, 1e-10);
-        assert_approx_eq!(pt.y, 0.0, 1e-10);
+        assert_approx_eq!(pt.x, 1.0_f64, 1e-10);
+        assert_approx_eq!(pt.y, 0.0_f64, 1e-10);
     }
 
     #[test]
@@ -47,8 +47,8 @@ mod tests {
         let opt = pt.projection_to_segment(&s);
         assert_eq!(opt.is_some(), true);
         let pt = opt.unwrap();
-        assert_approx_eq!(pt.x, 1.0, 1e-10);
-        assert_approx_eq!(pt.y, 0.0, 1e-10);
+        assert_approx_eq!(pt.x, 1.0_f64, 1e-10);
+        assert_approx_eq!(pt.y, 0.0_f64, 1e-10);
     }
 
     #[test]

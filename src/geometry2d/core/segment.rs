@@ -170,7 +170,7 @@ where
     }
 }
 
-//-------------------------------------------------- Norm --------------------------------------------------
+//-------------------------------------------------- Length --------------------------------------------------
 
 impl<T> Segment<T>
 where
@@ -178,7 +178,7 @@ where
     T: Pow2,
     <T as Pow2>::Output: Number,
 {
-    pub fn norm2(self) -> <T as Pow2>::Output {
+    pub fn length2(self) -> <T as Pow2>::Output {
         self.points.0.distance2(&self.points.1)
     }
 }
@@ -190,7 +190,7 @@ where
     <T as Pow2>::Output: Number,
     <T as Pow2>::Output: Root2<Output = T>,
 {
-    pub fn norm(self) -> T {
+    pub fn length(self) -> T {
         self.points.0.distance(&self.points.1)
     }
 }
@@ -282,7 +282,7 @@ where
 
 //-------------------------------------------------- Intersection --------------------------------------------------
 
-impl<T> Intersection<T, Line<T>> for Segment<T>
+impl<T> Segment<T>
 where
     T: Number,
     T: Mul,
@@ -291,12 +291,12 @@ where
     <<T as Mul>::Output as Div>::Output: Number,
     T: Mul<<<T as Mul>::Output as Div>::Output, Output = T>,
 {
-    fn intersection(&self, other: &Line<T>) -> Option<Point<T>> {
-        other.intersection(self)
+    pub fn intersection_to_line(&self, other: &Line<T>) -> Option<Point<T>> {
+        other.intersection_to_segment(self)
     }
 }
 
-impl<T> Intersection<T, Segment<T>> for Segment<T>
+impl<T> Segment<T>
 where
     T: Number,
     T: Mul,
@@ -305,7 +305,7 @@ where
     <<T as Mul>::Output as Div>::Output: Number,
     T: Mul<<<T as Mul>::Output as Div>::Output, Output = T>,
 {
-    fn intersection(&self, other: &Segment<T>) -> Option<Point<T>> {
+    pub fn intersection(&self, other: &Segment<T>) -> Option<Point<T>> {
         let self_v = self.to_vector();
         let other_v = other.to_vector();
         let den = self_v.cross_product(&other_v);
