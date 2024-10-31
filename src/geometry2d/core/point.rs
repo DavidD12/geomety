@@ -3,7 +3,7 @@ use sity::*;
 use std::fmt::Display;
 use std::ops::{Add, Div, Mul, Sub};
 
-#[derive(Debug, Clone, Copy, PartialEq, Default)]
+#[derive(Debug, Clone, PartialEq, Default)]
 pub struct Point<T: Number> {
     pub x: T,
     pub y: T,
@@ -36,114 +36,6 @@ where
     }
 }
 
-//-------------------------------------------------- Ops --------------------------------------------------
-
-impl<T> Add<T> for Point<T>
-where
-    T: Number,
-{
-    type Output = Self;
-
-    fn add(self, rhs: T) -> Self::Output {
-        Self {
-            x: self.x + rhs,
-            y: self.y + rhs,
-        }
-    }
-}
-
-impl<T> Sub<T> for Point<T>
-where
-    T: Number,
-{
-    type Output = Self;
-
-    fn sub(self, rhs: T) -> Self::Output {
-        Self {
-            x: self.x - rhs,
-            y: self.y - rhs,
-        }
-    }
-}
-
-impl<T, U> Mul<U> for Point<T>
-where
-    T: Number + Mul<U>,
-    U: Number,
-    <T as Mul<U>>::Output: Number,
-{
-    type Output = Point<<T as Mul<U>>::Output>;
-
-    fn mul(self, rhs: U) -> Point<<T as Mul<U>>::Output> {
-        Point::new(self.x * rhs, self.y * rhs)
-    }
-}
-
-impl<T, U> Div<U> for Point<T>
-where
-    T: Number + Div<U>,
-    U: Number,
-    <T as Div<U>>::Output: Number,
-{
-    type Output = Point<<T as Div<U>>::Output>;
-
-    fn div(self, rhs: U) -> Point<<T as Div<U>>::Output> {
-        Point::new(self.x / rhs, self.y / rhs)
-    }
-}
-
-//------------------------- Ops Vector -------------------------
-
-impl<T> Add<Vector<T>> for Point<T>
-where
-    T: Number,
-{
-    type Output = Self;
-
-    fn add(self, rhs: Vector<T>) -> Self::Output {
-        Point::new(self.x + rhs.dx, self.y + rhs.dy)
-    }
-}
-
-impl<T> Sub<Vector<T>> for Point<T>
-where
-    T: Number,
-{
-    type Output = Self;
-
-    fn sub(self, rhs: Vector<T>) -> Self {
-        Point::new(self.x - rhs.dx, self.y - rhs.dy)
-    }
-}
-
-impl<T, U> Mul<Vector<U>> for Point<T>
-where
-    T: Number,
-    U: Number,
-    T: Mul<U>,
-    <T as Mul<U>>::Output: Number,
-{
-    type Output = Point<<T as Mul<U>>::Output>;
-
-    fn mul(self, rhs: Vector<U>) -> Point<<T as Mul<U>>::Output> {
-        Point::new(self.x * rhs.dx, self.y * rhs.dy)
-    }
-}
-
-impl<T, U> Div<Vector<U>> for Point<T>
-where
-    T: Number,
-    U: Number,
-    T: Div<U>,
-    <T as Div<U>>::Output: Number,
-{
-    type Output = Point<<T as Div<U>>::Output>;
-
-    fn div(self, rhs: Vector<U>) -> Point<<T as Div<U>>::Output> {
-        Point::new(self.x / rhs.dx, self.y / rhs.dy)
-    }
-}
-
 //-------------------------------------------------- Translate --------------------------------------------------
 
 impl<T> Point<T>
@@ -154,6 +46,328 @@ where
         Self {
             x: self.x + dx,
             y: self.y + dy,
+        }
+    }
+}
+
+//-------------------------------------------------- Ops --------------------------------------------------
+
+//------------------------- Add -------------------------
+
+impl<T> Add<Vector<T>> for Point<T>
+where
+    T: Number,
+{
+    type Output = Self;
+
+    fn add(self, rhs: Vector<T>) -> Self::Output {
+        Self::Output {
+            x: self.x + rhs.dx,
+            y: self.y + rhs.dy,
+        }
+    }
+}
+
+impl<T> Add<Vector<T>> for &Point<T>
+where
+    T: Number,
+{
+    type Output = Point<T>;
+
+    fn add(self, rhs: Vector<T>) -> Self::Output {
+        Self::Output {
+            x: self.x + rhs.dx,
+            y: self.y + rhs.dy,
+        }
+    }
+}
+
+impl<T> Add<&Vector<T>> for Point<T>
+where
+    T: Number,
+{
+    type Output = Self;
+
+    fn add(self, rhs: &Vector<T>) -> Self::Output {
+        Self::Output {
+            x: self.x + rhs.dx,
+            y: self.y + rhs.dy,
+        }
+    }
+}
+
+impl<T> Add<&Vector<T>> for &Point<T>
+where
+    T: Number,
+{
+    type Output = Point<T>;
+
+    fn add(self, rhs: &Vector<T>) -> Self::Output {
+        Self::Output {
+            x: self.x + rhs.dx,
+            y: self.y + rhs.dy,
+        }
+    }
+}
+
+//------------------------- Sub -------------------------
+
+impl<T> Sub<Vector<T>> for Point<T>
+where
+    T: Number,
+{
+    type Output = Self;
+
+    fn sub(self, rhs: Vector<T>) -> Self::Output {
+        Self::Output {
+            x: self.x - rhs.dx,
+            y: self.y - rhs.dy,
+        }
+    }
+}
+
+impl<T> Sub<Vector<T>> for &Point<T>
+where
+    T: Number,
+{
+    type Output = Point<T>;
+
+    fn sub(self, rhs: Vector<T>) -> Self::Output {
+        Self::Output {
+            x: self.x - rhs.dx,
+            y: self.y - rhs.dy,
+        }
+    }
+}
+
+impl<T> Sub<&Vector<T>> for Point<T>
+where
+    T: Number,
+{
+    type Output = Self;
+
+    fn sub(self, rhs: &Vector<T>) -> Self::Output {
+        Self::Output {
+            x: self.x - rhs.dx,
+            y: self.y - rhs.dy,
+        }
+    }
+}
+
+impl<T> Sub<&Vector<T>> for &Point<T>
+where
+    T: Number,
+{
+    type Output = Point<T>;
+
+    fn sub(self, rhs: &Vector<T>) -> Self::Output {
+        Self::Output {
+            x: self.x - rhs.dx,
+            y: self.y - rhs.dy,
+        }
+    }
+}
+
+//------------------------- Mul -------------------------
+
+// impl<T, U> Mul<U> for Point<T>
+// where
+//     T: Number + Mul<U>,
+//     U: Number,
+//     <T as Mul<U>>::Output: Number,
+// {
+//     type Output = Point<<T as Mul<U>>::Output>;
+
+//     fn mul(self, rhs: U) -> Self::Output {
+//         Self::Output {
+//             x: self.x * rhs,
+//             y: self.y * rhs,
+//         }
+//     }
+// }
+
+// impl<T, U> Mul<U> for &Point<T>
+// where
+//     T: Number + Mul<U>,
+//     U: Number,
+//     <T as Mul<U>>::Output: Number,
+// {
+//     type Output = Point<<T as Mul<U>>::Output>;
+
+//     fn mul(self, rhs: U) -> Self::Output {
+//         Self::Output {
+//             x: self.x * rhs,
+//             y: self.y * rhs,
+//         }
+//     }
+// }
+
+impl<T, U> Mul<Vector<U>> for Point<T>
+where
+    T: Number,
+    U: Number,
+    T: Mul<U>,
+    <T as Mul<U>>::Output: Number,
+{
+    type Output = Point<<T as Mul<U>>::Output>;
+
+    fn mul(self, rhs: Vector<U>) -> Self::Output {
+        Self::Output {
+            x: self.x * rhs.dx,
+            y: self.y * rhs.dy,
+        }
+    }
+}
+
+impl<T, U> Mul<Vector<U>> for &Point<T>
+where
+    T: Number,
+    U: Number,
+    T: Mul<U>,
+    <T as Mul<U>>::Output: Number,
+{
+    type Output = Point<<T as Mul<U>>::Output>;
+
+    fn mul(self, rhs: Vector<U>) -> Self::Output {
+        Self::Output {
+            x: self.x * rhs.dx,
+            y: self.y * rhs.dy,
+        }
+    }
+}
+
+impl<T, U> Mul<&Vector<U>> for Point<T>
+where
+    T: Number,
+    U: Number,
+    T: Mul<U>,
+    <T as Mul<U>>::Output: Number,
+{
+    type Output = Point<<T as Mul<U>>::Output>;
+
+    fn mul(self, rhs: &Vector<U>) -> Self::Output {
+        Self::Output {
+            x: self.x * rhs.dx,
+            y: self.y * rhs.dy,
+        }
+    }
+}
+
+impl<T, U> Mul<&Vector<U>> for &Point<T>
+where
+    T: Number,
+    U: Number,
+    T: Mul<U>,
+    <T as Mul<U>>::Output: Number,
+{
+    type Output = Point<<T as Mul<U>>::Output>;
+
+    fn mul(self, rhs: &Vector<U>) -> Self::Output {
+        Self::Output {
+            x: self.x * rhs.dx,
+            y: self.y * rhs.dy,
+        }
+    }
+}
+
+//------------------------- Div -------------------------
+
+// impl<T, U> Div<U> for Point<T>
+// where
+//     T: Number + Div<U>,
+//     U: Number,
+//     <T as Div<U>>::Output: Number,
+// {
+//     type Output = Point<<T as Div<U>>::Output>;
+
+//     fn div(self, rhs: U) -> Self::Output {
+//         Self::Output {
+//             x: self.x / rhs,
+//             y: self.y / rhs,
+//         }
+//     }
+// }
+
+// impl<T, U> Div<U> for &Point<T>
+// where
+//     T: Number + Div<U>,
+//     U: Number,
+//     <T as Div<U>>::Output: Number,
+// {
+//     type Output = Point<<T as Div<U>>::Output>;
+
+//     fn div(self, rhs: U) -> Self::Output {
+//         Self::Output {
+//             x: self.x / rhs,
+//             y: self.y / rhs,
+//         }
+//     }
+// }
+
+impl<T, U> Div<Vector<U>> for Point<T>
+where
+    T: Number,
+    U: Number,
+    T: Div<U>,
+    <T as Div<U>>::Output: Number,
+{
+    type Output = Point<<T as Div<U>>::Output>;
+
+    fn div(self, rhs: Vector<U>) -> Self::Output {
+        Self::Output {
+            x: self.x / rhs.dx,
+            y: self.y / rhs.dy,
+        }
+    }
+}
+
+impl<T, U> Div<Vector<U>> for &Point<T>
+where
+    T: Number,
+    U: Number,
+    T: Div<U>,
+    <T as Div<U>>::Output: Number,
+{
+    type Output = Point<<T as Div<U>>::Output>;
+
+    fn div(self, rhs: Vector<U>) -> Self::Output {
+        Self::Output {
+            x: self.x / rhs.dx,
+            y: self.y / rhs.dy,
+        }
+    }
+}
+
+impl<T, U> Div<&Vector<U>> for Point<T>
+where
+    T: Number,
+    U: Number,
+    T: Div<U>,
+    <T as Div<U>>::Output: Number,
+{
+    type Output = Point<<T as Div<U>>::Output>;
+
+    fn div(self, rhs: &Vector<U>) -> Self::Output {
+        Self::Output {
+            x: self.x / rhs.dx,
+            y: self.y / rhs.dy,
+        }
+    }
+}
+
+impl<T, U> Div<&Vector<U>> for &Point<T>
+where
+    T: Number,
+    U: Number,
+    T: Div<U>,
+    <T as Div<U>>::Output: Number,
+{
+    type Output = Point<<T as Div<U>>::Output>;
+
+    fn div(self, rhs: &Vector<U>) -> Self::Output {
+        Self::Output {
+            x: self.x / rhs.dx,
+            y: self.y / rhs.dy,
         }
     }
 }
@@ -196,9 +410,9 @@ where
     <T as Mul>::Output: Div<T, Output = T>,
 {
     fn distance(&self, other: &Line<T>) -> T {
-        let w: Vector<_> = (self, &other.point).into();
-        let c = w.cross_product(&other.vector);
-        let l = other.vector.norm();
+        let w: Vector<_> = (self, other.point()).into();
+        let c = w.cross_product(other.vector());
+        let l = other.vector().norm();
         let d = c.abs() / l;
         d
     }
@@ -234,7 +448,7 @@ where
             return self.distance(other.second());
         }
         let delta = seg_v * t;
-        let x = *other.first() + delta;
+        let x = other.first() + delta;
         self.distance(&x)
     }
 }
@@ -277,7 +491,7 @@ where
     <T as Mul>::Output: Div<T, Output = T>,
 {
     fn distance(&self, other: &Circle<T>) -> T {
-        (self.distance(&other.center) - other.radius).max(T::ZERO)
+        (self.distance(other.center()) - other.radius()).max(T::ZERO)
     }
 }
 
@@ -294,12 +508,12 @@ where
     T: Mul<<<T as Mul>::Output as Div>::Output, Output = T>,
 {
     pub fn projection_to_line(&self, other: &Line<T>) -> Point<T> {
-        let v: Vector<_> = (&other.point, self).into();
-        let dp = v.dot_product(&other.vector);
-        let n2 = other.vector.norm2();
+        let v: Vector<_> = (other.point(), self).into();
+        let dp = v.dot_product(other.vector());
+        let n2 = other.vector().norm2();
         let t = dp / n2;
-        let delta = other.vector * t;
-        let x = other.point + delta;
+        let delta = other.vector() * t;
+        let x = other.point() + delta;
         x
     }
 }
@@ -324,7 +538,7 @@ where
             && t <= <<T as Mul>::Output as Div>::Output::ONE
         {
             let delta = seg_v * t;
-            let x = *other.first() + delta;
+            let x = other.first() + delta;
             Some(x)
         } else {
             None

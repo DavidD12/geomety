@@ -3,9 +3,9 @@ use sity::*;
 use std::fmt::Display;
 use std::ops::{Add, Div, Mul, Sub};
 
-#[derive(Debug, Clone, Copy, PartialEq, Default)]
+#[derive(Debug, Clone, PartialEq, Default)]
 pub struct Segment<T: Number> {
-    pub points: (Point<T>, Point<T>),
+    points: (Point<T>, Point<T>),
 }
 
 //-------------------------------------------------- New --------------------------------------------------
@@ -45,114 +45,14 @@ where
 
 //-------------------------------------------------- ToVector --------------------------------------------------
 
-impl<T> ToVector<T> for Segment<T>
+impl<T> Segment<T>
 where
     T: Number,
 {
-    fn to_vector(&self) -> Vector<T> {
+    pub fn to_vector(&self) -> Vector<T> {
         let dx = self.points.1.x - self.points.0.x;
         let dy = self.points.1.y - self.points.0.y;
         Vector::new(dx, dy)
-    }
-}
-
-//-------------------------------------------------- Ops --------------------------------------------------
-
-impl<T> Add<T> for Segment<T>
-where
-    T: Number,
-{
-    type Output = Self;
-
-    fn add(self, rhs: T) -> Self::Output {
-        Segment::new(self.points.0 + rhs, self.points.1 + rhs)
-    }
-}
-
-impl<T> Sub<T> for Segment<T>
-where
-    T: Number,
-{
-    type Output = Self;
-
-    fn sub(self, rhs: T) -> Self::Output {
-        Segment::new(self.points.0 - rhs, self.points.1 - rhs)
-    }
-}
-
-impl<T> Mul<T> for Segment<T>
-where
-    T: Number + Mul,
-    <T as Mul>::Output: Number,
-{
-    type Output = Segment<<T as Mul>::Output>;
-
-    fn mul(self, rhs: T) -> Segment<<T as Mul>::Output> {
-        Segment::new(self.points.0 * rhs, self.points.1 * rhs)
-    }
-}
-
-impl<T> Div<T> for Segment<T>
-where
-    T: Number + Div,
-    <T as Div>::Output: Number,
-{
-    type Output = Segment<<T as Div>::Output>;
-
-    fn div(self, rhs: T) -> Segment<<T as Div>::Output> {
-        Segment::new(self.points.0 / rhs, self.points.1 / rhs)
-    }
-}
-
-//------------------------- Ops Vector -------------------------
-
-impl<T> Add<Vector<T>> for Segment<T>
-where
-    T: Number,
-{
-    type Output = Self;
-
-    fn add(self, rhs: Vector<T>) -> Self::Output {
-        Segment::new(self.points.0 + rhs, self.points.1 + rhs)
-    }
-}
-
-impl<T> Sub<Vector<T>> for Segment<T>
-where
-    T: Number,
-{
-    type Output = Self;
-
-    fn sub(self, rhs: Vector<T>) -> Self {
-        Segment::new(self.points.0 - rhs, self.points.1 - rhs)
-    }
-}
-
-impl<T, U> Mul<Vector<U>> for Segment<T>
-where
-    T: Number,
-    U: Number,
-    T: Mul<U>,
-    <T as Mul<U>>::Output: Number,
-{
-    type Output = Segment<<T as Mul<U>>::Output>;
-
-    fn mul(self, rhs: Vector<U>) -> Segment<<T as Mul<U>>::Output> {
-        Segment::new(self.points.0 * rhs, self.points.1 * rhs)
-    }
-}
-
-impl<T, U> Div<Vector<U>> for Segment<T>
-where
-    T: Number,
-    U: Number,
-    T: Div<U>,
-    <T as Div<U>>::Output: Number,
-{
-    type Output = Segment<<T as Div<U>>::Output>;
-
-    fn div(self, rhs: Vector<U>) -> Segment<<T as Div<U>>::Output> {
-        Segment::new(self.points.0 / rhs, self.points.1 / rhs)
     }
 }
 
@@ -163,10 +63,254 @@ where
     T: Number,
 {
     pub fn translate(&self, dx: T, dy: T) -> Self {
-        Self::new(
-            self.points.0.translate(dx, dy),
-            self.points.1.translate(dx, dy),
-        )
+        Self {
+            points: (
+                self.first().translate(dx, dy),
+                self.second().translate(dx, dy),
+            ),
+        }
+    }
+}
+
+//-------------------------------------------------- Ops --------------------------------------------------
+
+//------------------------- Add -------------------------
+
+impl<T> Add<Vector<T>> for Segment<T>
+where
+    T: Number,
+{
+    type Output = Self;
+
+    fn add(self, rhs: Vector<T>) -> Self::Output {
+        Self::Output {
+            points: (self.first() + &rhs, self.second() + rhs),
+        }
+    }
+}
+
+impl<T> Add<Vector<T>> for &Segment<T>
+where
+    T: Number,
+{
+    type Output = Segment<T>;
+
+    fn add(self, rhs: Vector<T>) -> Self::Output {
+        Self::Output {
+            points: (self.first() + &rhs, self.second() + rhs),
+        }
+    }
+}
+
+impl<T> Add<&Vector<T>> for Segment<T>
+where
+    T: Number,
+{
+    type Output = Self;
+
+    fn add(self, rhs: &Vector<T>) -> Self::Output {
+        Self::Output {
+            points: (self.first() + rhs, self.second() + rhs),
+        }
+    }
+}
+
+impl<T> Add<&Vector<T>> for &Segment<T>
+where
+    T: Number,
+{
+    type Output = Segment<T>;
+
+    fn add(self, rhs: &Vector<T>) -> Self::Output {
+        Self::Output {
+            points: (self.first() + rhs, self.second() + rhs),
+        }
+    }
+}
+
+//------------------------- Sub -------------------------
+
+impl<T> Sub<Vector<T>> for Segment<T>
+where
+    T: Number,
+{
+    type Output = Self;
+
+    fn sub(self, rhs: Vector<T>) -> Self::Output {
+        Self::Output {
+            points: (self.first() - &rhs, self.second() - rhs),
+        }
+    }
+}
+
+impl<T> Sub<Vector<T>> for &Segment<T>
+where
+    T: Number,
+{
+    type Output = Segment<T>;
+
+    fn sub(self, rhs: Vector<T>) -> Self::Output {
+        Self::Output {
+            points: (self.first() - &rhs, self.second() - rhs),
+        }
+    }
+}
+
+impl<T> Sub<&Vector<T>> for Segment<T>
+where
+    T: Number,
+{
+    type Output = Self;
+
+    fn sub(self, rhs: &Vector<T>) -> Self::Output {
+        Self::Output {
+            points: (self.first() - rhs, self.second() - rhs),
+        }
+    }
+}
+
+impl<T> Sub<&Vector<T>> for &Segment<T>
+where
+    T: Number,
+{
+    type Output = Segment<T>;
+
+    fn sub(self, rhs: &Vector<T>) -> Self::Output {
+        Self::Output {
+            points: (self.first() - rhs, self.second() - rhs),
+        }
+    }
+}
+
+//------------------------- Mul -------------------------
+
+impl<T, U> Mul<Vector<U>> for Segment<T>
+where
+    T: Number,
+    U: Number,
+    T: Mul<U>,
+    <T as Mul<U>>::Output: Number,
+{
+    type Output = Segment<<T as Mul<U>>::Output>;
+
+    fn mul(self, rhs: Vector<U>) -> Self::Output {
+        Self::Output {
+            points: (self.first() * &rhs, self.second() * rhs),
+        }
+    }
+}
+
+impl<T, U> Mul<Vector<U>> for &Segment<T>
+where
+    T: Number,
+    U: Number,
+    T: Mul<U>,
+    <T as Mul<U>>::Output: Number,
+{
+    type Output = Segment<<T as Mul<U>>::Output>;
+
+    fn mul(self, rhs: Vector<U>) -> Self::Output {
+        Self::Output {
+            points: (self.first() * &rhs, self.second() * rhs),
+        }
+    }
+}
+
+impl<T, U> Mul<&Vector<U>> for Segment<T>
+where
+    T: Number,
+    U: Number,
+    T: Mul<U>,
+    <T as Mul<U>>::Output: Number,
+{
+    type Output = Segment<<T as Mul<U>>::Output>;
+
+    fn mul(self, rhs: &Vector<U>) -> Self::Output {
+        Self::Output {
+            points: (self.first() * rhs, self.second() * rhs),
+        }
+    }
+}
+
+impl<T, U> Mul<&Vector<U>> for &Segment<T>
+where
+    T: Number,
+    U: Number,
+    T: Mul<U>,
+    <T as Mul<U>>::Output: Number,
+{
+    type Output = Segment<<T as Mul<U>>::Output>;
+
+    fn mul(self, rhs: &Vector<U>) -> Self::Output {
+        Self::Output {
+            points: (self.first() * rhs, self.second() * rhs),
+        }
+    }
+}
+
+//------------------------- Div -------------------------
+
+impl<T, U> Div<Vector<U>> for Segment<T>
+where
+    T: Number,
+    U: Number,
+    T: Div<U>,
+    <T as Div<U>>::Output: Number,
+{
+    type Output = Segment<<T as Div<U>>::Output>;
+
+    fn div(self, rhs: Vector<U>) -> Self::Output {
+        Self::Output {
+            points: (self.first() / &rhs, self.second() / rhs),
+        }
+    }
+}
+
+impl<T, U> Div<Vector<U>> for &Segment<T>
+where
+    T: Number,
+    U: Number,
+    T: Div<U>,
+    <T as Div<U>>::Output: Number,
+{
+    type Output = Segment<<T as Div<U>>::Output>;
+
+    fn div(self, rhs: Vector<U>) -> Self::Output {
+        Self::Output {
+            points: (self.first() / &rhs, self.second() / rhs),
+        }
+    }
+}
+
+impl<T, U> Div<&Vector<U>> for Segment<T>
+where
+    T: Number,
+    U: Number,
+    T: Div<U>,
+    <T as Div<U>>::Output: Number,
+{
+    type Output = Segment<<T as Div<U>>::Output>;
+
+    fn div(self, rhs: &Vector<U>) -> Self::Output {
+        Self::Output {
+            points: (self.first() / rhs, self.second() / rhs),
+        }
+    }
+}
+
+impl<T, U> Div<&Vector<U>> for &Segment<T>
+where
+    T: Number,
+    U: Number,
+    T: Div<U>,
+    <T as Div<U>>::Output: Number,
+{
+    type Output = Segment<<T as Div<U>>::Output>;
+
+    fn div(self, rhs: &Vector<U>) -> Self::Output {
+        Self::Output {
+            points: (self.first() / rhs, self.second() / rhs),
+        }
     }
 }
 
@@ -321,7 +465,7 @@ where
                 && t <= <<T as Mul>::Output as Div>::Output::ONE
             {
                 let delta = self_v * t;
-                let x = *self.first() + delta;
+                let x = self.first() + delta;
                 Some(x)
             } else {
                 None

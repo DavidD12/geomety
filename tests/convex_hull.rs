@@ -24,6 +24,6 @@ mod tests {
         let opt = Polygon::convex_hull(points);
         assert_eq!(opt.is_some(), true);
         let hull = opt.unwrap();
-        assert_eq!(hull.points, expected_hull);
+        assert_eq!(hull.points(), &expected_hull);
     }
 }

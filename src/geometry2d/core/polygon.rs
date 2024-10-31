@@ -5,10 +5,16 @@ use super::*;
 use sity::*;
 #[derive(Debug, Clone, PartialEq, Default)]
 pub struct Polygon<T: Number> {
-    pub points: Vec<Point<T>>,
+    points: Vec<Point<T>>,
 }
 
 //-------------------------------------------------- New --------------------------------------------------
+
+impl<T: Number> Polygon<T> {
+    pub fn points(&self) -> &Vec<Point<T>> {
+        &self.points
+    }
+}
 
 impl<T> Polygon<T>
 where
@@ -87,11 +93,11 @@ where
         let mut segments = self
             .points
             .windows(2)
-            .map(|pts| Segment::new(pts[0], pts[1]))
+            .map(|pts| Segment::new(pts[0].clone(), pts[1].clone()))
             .collect::<Vec<_>>();
         segments.push(Segment::new(
-            *self.points.last().unwrap(),
-            *self.points.first().unwrap(),
+            self.points.last().unwrap().clone(),
+            self.points.first().unwrap().clone(),
         ));
         segments
     }
@@ -110,6 +116,116 @@ where
             .map(|pt| pt.to_value())
             .collect::<Vec<_>>();
         Polygon { points }
+    }
+}
+
+//-------------------------------------------------- Ops --------------------------------------------------
+
+//------------------------- Add -------------------------
+
+impl<T> Add<Vector<T>> for Polygon<T>
+where
+    T: Number,
+{
+    type Output = Self;
+
+    fn add(self, rhs: Vector<T>) -> Self::Output {
+        Self::Output {
+            points: self.points.iter().map(|pt| pt + &rhs).collect(),
+        }
+    }
+}
+
+impl<T> Add<Vector<T>> for &Polygon<T>
+where
+    T: Number,
+{
+    type Output = Polygon<T>;
+
+    fn add(self, rhs: Vector<T>) -> Self::Output {
+        Self::Output {
+            points: self.points.iter().map(|pt| pt + &rhs).collect(),
+        }
+    }
+}
+
+impl<T> Add<&Vector<T>> for Polygon<T>
+where
+    T: Number,
+{
+    type Output = Self;
+
+    fn add(self, rhs: &Vector<T>) -> Self::Output {
+        Self::Output {
+            points: self.points.iter().map(|pt| pt + rhs).collect(),
+        }
+    }
+}
+
+impl<T> Add<&Vector<T>> for &Polygon<T>
+where
+    T: Number,
+{
+    type Output = Polygon<T>;
+
+    fn add(self, rhs: &Vector<T>) -> Self::Output {
+        Self::Output {
+            points: self.points.iter().map(|pt| pt + rhs).collect(),
+        }
+    }
+}
+
+//------------------------- Sub -------------------------
+
+impl<T> Sub<Vector<T>> for Polygon<T>
+where
+    T: Number,
+{
+    type Output = Self;
+
+    fn sub(self, rhs: Vector<T>) -> Self::Output {
+        Self::Output {
+            points: self.points.iter().map(|pt| pt - &rhs).collect(),
+        }
+    }
+}
+
+impl<T> Sub<Vector<T>> for &Polygon<T>
+where
+    T: Number,
+{
+    type Output = Polygon<T>;
+
+    fn sub(self, rhs: Vector<T>) -> Self::Output {
+        Self::Output {
+            points: self.points.iter().map(|pt| pt - &rhs).collect(),
+        }
+    }
+}
+
+impl<T> Sub<&Vector<T>> for Polygon<T>
+where
+    T: Number,
+{
+    type Output = Self;
+
+    fn sub(self, rhs: &Vector<T>) -> Self::Output {
+        Self::Output {
+            points: self.points.iter().map(|pt| pt - rhs).collect(),
+        }
+    }
+}
+
+impl<T> Sub<&Vector<T>> for &Polygon<T>
+where
+    T: Number,
+{
+    type Output = Polygon<T>;
+
+    fn sub(self, rhs: &Vector<T>) -> Self::Output {
+        Self::Output {
+            points: self.points.iter().map(|pt| pt - rhs).collect(),
+        }
     }
 }
 

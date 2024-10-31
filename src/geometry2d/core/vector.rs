@@ -1,10 +1,10 @@
 use super::*;
 use std::fmt::Display;
-use std::ops::{Add, Div, Mul, Sub};
+use std::ops::{Add, Div, DivAssign, Mul, Sub};
 
 use sity::*;
 
-#[derive(Debug, Clone, Copy, PartialEq, Default)]
+#[derive(Debug, Clone, PartialEq, Default)]
 pub struct Vector<T: Number> {
     pub dx: T,
     pub dy: T,
@@ -62,16 +62,18 @@ where
 
 //-------------------------------------------------- ToVector --------------------------------------------------
 
-impl<T> ToVector<T> for Vector<T>
-where
-    T: Number,
-{
-    fn to_vector(&self) -> Vector<T> {
-        *self
-    }
-}
+// impl<T> ToVector<T> for Vector<T>
+// where
+//     T: Number,
+// {
+//     fn to_vector(&self) -> &Vector<T> {
+//         &self
+//     }
+// }
 
 //-------------------------------------------------- Ops --------------------------------------------------
+
+//------------------------- Add -------------------------
 
 impl<T> Add<T> for Vector<T>
 where
@@ -87,6 +89,78 @@ where
     }
 }
 
+impl<T> Add<T> for &Vector<T>
+where
+    T: Number,
+{
+    type Output = Vector<T>;
+
+    fn add(self, rhs: T) -> Self::Output {
+        Self::Output {
+            dx: self.dx + rhs,
+            dy: self.dy + rhs,
+        }
+    }
+}
+
+impl<T> Add<Self> for Vector<T>
+where
+    T: Number,
+{
+    type Output = Self;
+
+    fn add(self, rhs: Vector<T>) -> Self::Output {
+        Self {
+            dx: self.dx + rhs.dx,
+            dy: self.dy + rhs.dy,
+        }
+    }
+}
+
+impl<T> Add<Vector<T>> for &Vector<T>
+where
+    T: Number,
+{
+    type Output = Vector<T>;
+
+    fn add(self, rhs: Vector<T>) -> Self::Output {
+        Self::Output {
+            dx: self.dx + rhs.dx,
+            dy: self.dy + rhs.dy,
+        }
+    }
+}
+
+impl<T> Add<&Vector<T>> for Vector<T>
+where
+    T: Number,
+{
+    type Output = Self;
+
+    fn add(self, rhs: &Vector<T>) -> Self::Output {
+        Self::Output {
+            dx: self.dx + rhs.dx,
+            dy: self.dy + rhs.dy,
+        }
+    }
+}
+
+impl<T> Add<Self> for &Vector<T>
+where
+    T: Number,
+{
+    type Output = Vector<T>;
+
+    fn add(self, rhs: Self) -> Self::Output {
+        Self::Output {
+            dx: self.dx + rhs.dx,
+            dy: self.dy + rhs.dy,
+        }
+    }
+}
+
+//------------------------- Sub -------------------------
+
 impl<T> Sub<T> for Vector<T>
 where
     T: Number,
@@ -101,49 +175,21 @@ where
     }
 }
 
-impl<T, U> Mul<U> for Vector<T>
-where
-    T: Number + Mul<U>,
-    U: Number,
-    <T as Mul<U>>::Output: Number,
-{
-    type Output = Vector<<T as Mul<U>>::Output>;
-
-    fn mul(self, rhs: U) -> Vector<<T as Mul<U>>::Output> {
-        Vector::new(self.dx * rhs, self.dy * rhs)
-    }
-}
-
-impl<T, U> Div<U> for Vector<T>
-where
-    T: Number + Div<U>,
-    U: Number,
-    <T as Div<U>>::Output: Number,
-{
-    type Output = Vector<<T as Div<U>>::Output>;
-
-    fn div(self, rhs: U) -> Vector<<T as Div<U>>::Output> {
-        Vector::new(self.dx / rhs, self.dy / rhs)
-    }
-}
-
-//------------------------- Ops Vector -------------------------
-
-impl<T> Add for Vector<T>
+impl<T> Sub<T> for &Vector<T>
 where
     T: Number,
 {
-    type Output = Self;
+    type Output = Vector<T>;
 
-    fn add(self, rhs: Self) -> Self::Output {
-        Self {
-            dx: self.dx + rhs.dx,
-            dy: self.dy + rhs.dy,
+    fn sub(self, rhs: T) -> Self::Output {
+        Self::Output {
+            dx: self.dx - rhs,
+            dy: self.dy - rhs,
         }
     }
 }
 
-impl<T> Sub for Vector<T>
+impl<T> Sub<Self> for Vector<T>
 where
     T: Number,
 {
@@ -153,6 +199,82 @@ where
         Self {
             dx: self.dx - rhs.dx,
             dy: self.dy - rhs.dy,
+        }
+    }
+}
+
+impl<T> Sub<Vector<T>> for &Vector<T>
+where
+    T: Number,
+{
+    type Output = Vector<T>;
+
+    fn sub(self, rhs: Vector<T>) -> Self::Output {
+        Self::Output {
+            dx: self.dx - rhs.dx,
+            dy: self.dy - rhs.dy,
+        }
+    }
+}
+
+impl<T> Sub<&Vector<T>> for Vector<T>
+where
+    T: Number,
+{
+    type Output = Self;
+
+    fn sub(self, rhs: &Vector<T>) -> Self::Output {
+        Self::Output {
+            dx: self.dx - rhs.dx,
+            dy: self.dy - rhs.dy,
+        }
+    }
+}
+
+impl<T> Sub<&Vector<T>> for &Vector<T>
+where
+    T: Number,
+{
+    type Output = Vector<T>;
+
+    fn sub(self, rhs: &Vector<T>) -> Self::Output {
+        Self::Output {
+            dx: self.dx - rhs.dx,
+            dy: self.dy - rhs.dy,
+        }
+    }
+}
+
+//------------------------- Mul -------------------------
+
+impl<T, U> Mul<U> for Vector<T>
+where
+    T: Number + Mul<U>,
+    U: Number,
+    <T as Mul<U>>::Output: Number,
+{
+    type Output = Vector<<T as Mul<U>>::Output>;
+
+    fn mul(self, rhs: U) -> Vector<<T as Mul<U>>::Output> {
+        Self::Output {
+            dx: self.dx * rhs,
+            dy: self.dy * rhs,
+        }
+    }
+}
+
+impl<T, U> Mul<U> for &Vector<T>
+where
+    T: Number + Mul<U>,
+    U: Number,
+    <T as Mul<U>>::Output: Number,
+{
+    type Output = Vector<<T as Mul<U>>::Output>;
+
+    fn mul(self, rhs: U) -> Vector<<T as Mul<U>>::Output> {
+        Self::Output {
+            dx: self.dx * rhs,
+            dy: self.dy * rhs,
         }
     }
 }
@@ -167,7 +289,95 @@ where
     type Output = Vector<<T as Mul<U>>::Output>;
 
     fn mul(self, rhs: Vector<U>) -> Vector<<T as Mul<U>>::Output> {
-        Vector::new(self.dx * rhs.dx, self.dy * rhs.dy)
+        Self::Output {
+            dx: self.dx * rhs.dx,
+            dy: self.dy * rhs.dy,
+        }
+    }
+}
+
+impl<T, U> Mul<Vector<U>> for &Vector<T>
+where
+    T: Number,
+    U: Number,
+    T: Mul<U>,
+    <T as Mul<U>>::Output: Number,
+{
+    type Output = Vector<<T as Mul<U>>::Output>;
+
+    fn mul(self, rhs: Vector<U>) -> Vector<<T as Mul<U>>::Output> {
+        Self::Output {
+            dx: self.dx * rhs.dx,
+            dy: self.dy * rhs.dy,
+        }
+    }
+}
+
+impl<T, U> Mul<&Vector<U>> for Vector<T>
+where
+    T: Number,
+    U: Number,
+    T: Mul<U>,
+    <T as Mul<U>>::Output: Number,
+{
+    type Output = Vector<<T as Mul<U>>::Output>;
+
+    fn mul(self, rhs: &Vector<U>) -> Vector<<T as Mul<U>>::Output> {
+        Self::Output {
+            dx: self.dx * rhs.dx,
+            dy: self.dy * rhs.dy,
+        }
+    }
+}
+
+impl<T, U> Mul<&Vector<U>> for &Vector<T>
+where
+    T: Number,
+    U: Number,
+    T: Mul<U>,
+    <T as Mul<U>>::Output: Number,
+{
+    type Output = Vector<<T as Mul<U>>::Output>;
+
+    fn mul(self, rhs: &Vector<U>) -> Vector<<T as Mul<U>>::Output> {
+        Self::Output {
+            dx: self.dx * rhs.dx,
+            dy: self.dy * rhs.dy,
+        }
+    }
+}
+
+//------------------------- Div -------------------------
+
+impl<T, U> Div<U> for Vector<T>
+where
+    T: Number + Div<U>,
+    U: Number,
+    <T as Div<U>>::Output: Number,
+{
+    type Output = Vector<<T as Div<U>>::Output>;
+
+    fn div(self, rhs: U) -> Vector<<T as Div<U>>::Output> {
+        Self::Output {
+            dx: self.dx / rhs,
+            dy: self.dy / rhs,
+        }
+    }
+}
+
+impl<T, U> Div<U> for &Vector<T>
+where
+    T: Number + Div<U>,
+    U: Number,
+    <T as Div<U>>::Output: Number,
+{
+    type Output = Vector<<T as Div<U>>::Output>;
+
+    fn div(self, rhs: U) -> Vector<<T as Div<U>>::Output> {
+        Self::Output {
+            dx: self.dx / rhs,
+            dy: self.dy / rhs,
+        }
     }
 }
 
@@ -181,7 +391,61 @@ where
     type Output = Vector<<T as Div<U>>::Output>;
 
     fn div(self, rhs: Vector<U>) -> Vector<<T as Div<U>>::Output> {
-        Vector::new(self.dx / rhs.dx, self.dy / rhs.dy)
+        Self::Output {
+            dx: self.dx / rhs.dx,
+            dy: self.dy / rhs.dy,
+        }
+    }
+}
+
+impl<T, U> Div<Vector<U>> for &Vector<T>
+where
+    T: Number,
+    U: Number,
+    T: Div<U>,
+    <T as Div<U>>::Output: Number,
+{
+    type Output = Vector<<T as Div<U>>::Output>;
+
+    fn div(self, rhs: Vector<U>) -> Vector<<T as Div<U>>::Output> {
+        Self::Output {
+            dx: self.dx / rhs.dx,
+            dy: self.dy / rhs.dy,
+        }
+    }
+}
+
+impl<T, U> Div<&Vector<U>> for Vector<T>
+where
+    T: Number,
+    U: Number,
+    T: Div<U>,
+    <T as Div<U>>::Output: Number,
+{
+    type Output = Vector<<T as Div<U>>::Output>;
+
+    fn div(self, rhs: &Vector<U>) -> Vector<<T as Div<U>>::Output> {
+        Self::Output {
+            dx: self.dx / rhs.dx,
+            dy: self.dy / rhs.dy,
+        }
+    }
+}
+
+impl<T, U> Div<&Vector<U>> for &Vector<T>
+where
+    T: Number,
+    U: Number,
+    T: Div<U>,
+    <T as Div<U>>::Output: Number,
+{
+    type Output = Vector<<T as Div<U>>::Output>;
+
+    fn div(self, rhs: &Vector<U>) -> Vector<<T as Div<U>>::Output> {
+        Self::Output {
+            dx: self.dx / rhs.dx,
+            dy: self.dy / rhs.dy,
+        }
     }
 }
 
@@ -220,13 +484,78 @@ where
     <T as Pow2>::Output: Number,
     <T as Pow2>::Output: Root2<Output = T>,
     // /
+    T: DivAssign<<T as HasValue>::Output>,
+{
+    pub fn normalize(&mut self) {
+        let length = self.norm().value();
+        self.dx /= length;
+        self.dy /= length;
+    }
+}
+
+impl<T> Vector<T>
+where
+    T: Number,
+    // length
+    T: Pow2,
+    <T as Pow2>::Output: Number,
+    <T as Pow2>::Output: Root2<Output = T>,
+    // /
     T: Div<<T as HasValue>::Output, Output = T>,
 {
-    pub fn normalize(&self) -> Self {
+    pub fn normalized(&self) -> Self {
         let length = self.norm().value();
         Self {
             dx: self.dx / length,
             dy: self.dy / length,
+        }
+    }
+}
+
+//-------------------------------------------------- Perpendcular --------------------------------------------------
+
+impl<T> Vector<T>
+where
+    T: Number,
+    T: std::ops::Neg<Output = T>,
+{
+    pub fn perpendicular_clockwise(&self) -> Self {
+        Self {
+            dx: self.dy,
+            dy: -self.dx,
+        }
+    }
+
+    pub fn perpendicular_counterclockwise(&self) -> Self {
+        Self {
+            dx: -self.dy,
+            dy: self.dx,
+        }
+    }
+}
+
+//-------------------------------------------------- Reverse --------------------------------------------------
+
+impl<T> Vector<T>
+where
+    T: Number,
+    T: std::ops::Neg<Output = T>,
+{
+    pub fn reverse(&mut self) {
+        self.dx = -self.dx;
+        self.dy = -self.dy;
+    }
+}
+
+impl<T> Vector<T>
+where
+    T: Number,
+    T: std::ops::Neg<Output = T>,
+{
+    pub fn reversed(&self) -> Self {
+        Self {
+            dx: -self.dx,
+            dy: -self.dy,
         }
     }
 }

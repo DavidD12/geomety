@@ -3,10 +3,10 @@ use sity::*;
 use std::fmt::Display;
 use std::ops::{Add, Div, Mul, Sub};
 
-#[derive(Debug, Clone, Copy, PartialEq, Default)]
+#[derive(Debug, Clone, PartialEq, Default)]
 pub struct Line<T: Number> {
-    pub point: Point<T>,
-    pub vector: Vector<T>,
+    point: Point<T>,
+    vector: Vector<T>,
 }
 
 //-------------------------------------------------- New --------------------------------------------------
@@ -14,6 +14,14 @@ pub struct Line<T: Number> {
 impl<T: Number> Line<T> {
     pub fn new(point: Point<T>, vector: Vector<T>) -> Self {
         Self { point, vector }
+    }
+
+    pub fn point(&self) -> &Point<T> {
+        &self.point
+    }
+
+    pub fn vector(&self) -> &Vector<T> {
+        &self.vector
     }
 }
 
@@ -36,121 +44,6 @@ where
     }
 }
 
-//-------------------------------------------------- To Vector --------------------------------------------------
-
-impl<T> ToVector<T> for Line<T>
-where
-    T: Number,
-{
-    fn to_vector(&self) -> Vector<T> {
-        self.vector
-    }
-}
-
-//-------------------------------------------------- Ops --------------------------------------------------
-
-impl<T> Add<T> for Line<T>
-where
-    T: Number,
-{
-    type Output = Self;
-
-    fn add(self, rhs: T) -> Self::Output {
-        Self {
-            point: self.point + rhs,
-            vector: self.vector,
-        }
-    }
-}
-
-impl<T> Sub<T> for Line<T>
-where
-    T: Number,
-{
-    type Output = Self;
-
-    fn sub(self, rhs: T) -> Self::Output {
-        Self {
-            point: self.point - rhs,
-            vector: self.vector,
-        }
-    }
-}
-
-impl<T> Mul<T> for Line<T>
-where
-    T: Number + Mul,
-    <T as Mul>::Output: Number,
-{
-    type Output = Line<<T as Mul>::Output>;
-
-    fn mul(self, rhs: T) -> Line<<T as Mul>::Output> {
-        Line::new(self.point * rhs, self.vector * rhs)
-    }
-}
-
-impl<T> Div<T> for Line<T>
-where
-    T: Number + Div,
-    <T as Div>::Output: Number,
-{
-    type Output = Line<<T as Div>::Output>;
-
-    fn div(self, rhs: T) -> Line<<T as Div>::Output> {
-        Line::new(self.point / rhs, self.vector / rhs)
-    }
-}
-
-//------------------------- Ops Vector -------------------------
-
-impl<T> Add<Vector<T>> for Line<T>
-where
-    T: Number,
-{
-    type Output = Self;
-
-    fn add(self, rhs: Vector<T>) -> Self::Output {
-        Line::new(self.point + rhs.dx, self.vector)
-    }
-}
-
-impl<T> Sub<Vector<T>> for Line<T>
-where
-    T: Number,
-{
-    type Output = Self;
-
-    fn sub(self, rhs: Vector<T>) -> Self {
-        Line::new(self.point - rhs.dx, self.vector)
-    }
-}
-
-// impl<T, U> Mul<Vector<U>> for Line<T>
-// where
-//     T: Number,
-//     U: Number,
-//     Point<T>: Mul<U, Output = Point<T>>,
-// {
-//     type Output = Line<T>;
-
-//     fn mul(self, rhs: Vector<U>) -> Line<T> {
-//         Line::new(self.point * rhs.dx, self.vector)
-//     }
-// }
-
-// impl<T, U> Div<Vector<U>> for Line<T>
-// where
-//     T: Number,
-//     U: Number,
-//     Point<T>: Div<U, Output = Point<T>>,
-// {
-//     type Output = Line<T>;
-
-//     fn div(self, rhs: Vector<U>) -> Line<T> {
-//         Line::new(self.point / rhs.dx, self.vector)
-//     }
-// }
-
 //-------------------------------------------------- Translate --------------------------------------------------
 
 impl<T> Line<T>
@@ -160,7 +53,276 @@ where
     pub fn translate(&self, dx: T, dy: T) -> Self {
         Self {
             point: self.point.translate(dx, dy),
-            vector: self.vector,
+            vector: self.vector.clone(),
+        }
+    }
+}
+
+//-------------------------------------------------- To Vector --------------------------------------------------
+
+// impl<T> ToVector<T> for Line<T>
+// where
+//     T: Number,
+// {
+//     fn to_vector(&self) -> Vector<T> {
+//         self.vector.clone()
+//     }
+// }
+
+//-------------------------------------------------- Ops --------------------------------------------------
+
+//------------------------- Add -------------------------
+
+impl<T> Add<Vector<T>> for Line<T>
+where
+    T: Number,
+{
+    type Output = Self;
+
+    fn add(self, rhs: Vector<T>) -> Self::Output {
+        Self::Output {
+            point: self.point() + &rhs,
+            vector: self.vector() + rhs,
+        }
+    }
+}
+
+impl<T> Add<Vector<T>> for &Line<T>
+where
+    T: Number,
+{
+    type Output = Line<T>;
+
+    fn add(self, rhs: Vector<T>) -> Self::Output {
+        Self::Output {
+            point: self.point() + &rhs,
+            vector: self.vector() + rhs,
+        }
+    }
+}
+
+impl<T> Add<&Vector<T>> for Line<T>
+where
+    T: Number,
+{
+    type Output = Self;
+
+    fn add(self, rhs: &Vector<T>) -> Self::Output {
+        Self::Output {
+            point: self.point() + rhs,
+            vector: self.vector() + rhs,
+        }
+    }
+}
+
+impl<T> Add<&Vector<T>> for &Line<T>
+where
+    T: Number,
+{
+    type Output = Line<T>;
+
+    fn add(self, rhs: &Vector<T>) -> Self::Output {
+        Self::Output {
+            point: self.point() + rhs,
+            vector: self.vector() + rhs,
+        }
+    }
+}
+
+//------------------------- Sub -------------------------
+
+impl<T> Sub<Vector<T>> for Line<T>
+where
+    T: Number,
+{
+    type Output = Self;
+
+    fn sub(self, rhs: Vector<T>) -> Self::Output {
+        Self::Output {
+            point: self.point() - &rhs,
+            vector: self.vector() - rhs,
+        }
+    }
+}
+
+impl<T> Sub<Vector<T>> for &Line<T>
+where
+    T: Number,
+{
+    type Output = Line<T>;
+
+    fn sub(self, rhs: Vector<T>) -> Self::Output {
+        Self::Output {
+            point: self.point() - &rhs,
+            vector: self.vector() - rhs,
+        }
+    }
+}
+
+impl<T> Sub<&Vector<T>> for Line<T>
+where
+    T: Number,
+{
+    type Output = Self;
+
+    fn sub(self, rhs: &Vector<T>) -> Self::Output {
+        Self::Output {
+            point: self.point() - rhs,
+            vector: self.vector() - rhs,
+        }
+    }
+}
+
+impl<T> Sub<&Vector<T>> for &Line<T>
+where
+    T: Number,
+{
+    type Output = Line<T>;
+
+    fn sub(self, rhs: &Vector<T>) -> Self::Output {
+        Self::Output {
+            point: self.point() - rhs,
+            vector: self.vector() - rhs,
+        }
+    }
+}
+
+//------------------------- Mul -------------------------
+
+impl<T, U> Mul<Vector<U>> for Line<T>
+where
+    T: Number,
+    U: Number,
+    T: Mul<U>,
+    <T as Mul<U>>::Output: Number,
+{
+    type Output = Line<<T as Mul<U>>::Output>;
+
+    fn mul(self, rhs: Vector<U>) -> Self::Output {
+        Self::Output {
+            point: self.point() * &rhs,
+            vector: self.vector() * rhs,
+        }
+    }
+}
+
+impl<T, U> Mul<Vector<U>> for &Line<T>
+where
+    T: Number,
+    U: Number,
+    T: Mul<U>,
+    <T as Mul<U>>::Output: Number,
+{
+    type Output = Line<<T as Mul<U>>::Output>;
+
+    fn mul(self, rhs: Vector<U>) -> Self::Output {
+        Self::Output {
+            point: self.point() * &rhs,
+            vector: self.vector() * rhs,
+        }
+    }
+}
+
+impl<T, U> Mul<&Vector<U>> for Line<T>
+where
+    T: Number,
+    U: Number,
+    T: Mul<U>,
+    <T as Mul<U>>::Output: Number,
+{
+    type Output = Line<<T as Mul<U>>::Output>;
+
+    fn mul(self, rhs: &Vector<U>) -> Self::Output {
+        Self::Output {
+            point: self.point() * rhs,
+            vector: self.vector() * rhs,
+        }
+    }
+}
+
+impl<T, U> Mul<&Vector<U>> for &Line<T>
+where
+    T: Number,
+    U: Number,
+    T: Mul<U>,
+    <T as Mul<U>>::Output: Number,
+{
+    type Output = Line<<T as Mul<U>>::Output>;
+
+    fn mul(self, rhs: &Vector<U>) -> Self::Output {
+        Self::Output {
+            point: self.point() * rhs,
+            vector: self.vector() * rhs,
+        }
+    }
+}
+
+//------------------------- Div -------------------------
+
+impl<T, U> Div<Vector<U>> for Line<T>
+where
+    T: Number,
+    U: Number,
+    T: Div<U>,
+    <T as Div<U>>::Output: Number,
+{
+    type Output = Line<<T as Div<U>>::Output>;
+
+    fn div(self, rhs: Vector<U>) -> Self::Output {
+        Self::Output {
+            point: self.point() / &rhs,
+            vector: self.vector() / rhs,
+        }
+    }
+}
+
+impl<T, U> Div<Vector<U>> for &Line<T>
+where
+    T: Number,
+    U: Number,
+    T: Div<U>,
+    <T as Div<U>>::Output: Number,
+{
+    type Output = Line<<T as Div<U>>::Output>;
+
+    fn div(self, rhs: Vector<U>) -> Self::Output {
+        Self::Output {
+            point: self.point() / &rhs,
+            vector: self.vector() / rhs,
+        }
+    }
+}
+
+impl<T, U> Div<&Vector<U>> for Line<T>
+where
+    T: Number,
+    U: Number,
+    T: Div<U>,
+    <T as Div<U>>::Output: Number,
+{
+    type Output = Line<<T as Div<U>>::Output>;
+
+    fn div(self, rhs: &Vector<U>) -> Self::Output {
+        Self::Output {
+            point: self.point() / rhs,
+            vector: self.vector() / rhs,
+        }
+    }
+}
+
+impl<T, U> Div<&Vector<U>> for &Line<T>
+where
+    T: Number,
+    U: Number,
+    T: Div<U>,
+    <T as Div<U>>::Output: Number,
+{
+    type Output = Line<<T as Div<U>>::Output>;
+
+    fn div(self, rhs: &Vector<U>) -> Self::Output {
+        Self::Output {
+            point: self.point() / rhs,
+            vector: self.vector() / rhs,
         }
     }
 }
@@ -268,8 +430,8 @@ where
             let v: Vector<_> = (&self.point, &other.point).into();
             let num = v.cross_product(&other.vector);
             let t = num / den;
-            let delta = self.vector * t;
-            let x = self.point + delta;
+            let delta = self.vector() * t;
+            let x = self.point() + delta;
             Some(x)
         }
     }
@@ -296,8 +458,8 @@ where
             if u >= <<<T as Mul>::Output as Sub>::Output as Div>::Output::ZERO
                 && u <= <<<T as Mul>::Output as Sub>::Output as Div>::Output::ONE
             {
-                let delta = self.vector * t;
-                let x = self.point + delta;
+                let delta = self.vector() * t;
+                let x = self.point() + delta;
                 Some(x)
             } else {
                 None

@@ -1,14 +1,111 @@
-use geometry2d::*;
-use geomety::*;
-use sity::*;
+use plotters::prelude::*;
 
-fn main() {
-    let p1 = Point::new(1.0, 3.0);
-    let p2 = Point::new(1.0, 1.0);
-    // let p1 = Position::new(metre(1.0), metre(3.0));
-    // let p2 = Position::new(metre(1.0), metre(1.0));
-    let a = p1.angle(&p2);
-    println!("{}", a);
+fn main() -> Result<(), Box<dyn std::error::Error>> {
+    // Création d'une zone de dessin
+    let root = BitMapBackend::new("geometrie.png", (1000, 1000)).into_drawing_area();
+    root.fill(&WHITE)?;
+
+    let x_min = -10.0;
+    let x_max = 20.0;
+    let y_min = -10.0;
+    let y_max = 20.0;
+
+    let mut chart: ChartContext<
+        '_,
+        BitMapBackend<'_>,
+        Cartesian2d<plotters::coord::types::RangedCoordf64, plotters::coord::types::RangedCoordf64>,
+    > = ChartBuilder::on(&root)
+        // .caption("y=x^2", ("sans-serif", 50).into_font())
+        .margin(5)
+        .x_label_area_size(50)
+        .y_label_area_size(50)
+        .build_cartesian_2d(x_min..x_max, y_min..y_max)?;
+    chart.configure_mesh().draw()?;
+
+    {
+        use geometry2d::*;
+        use geomety::*;
+
+        let p1 = Point::new(0.0, 0.0);
+        let r1 = 2.0;
+        let c1 = Circle::new(p1, r1);
+        let p2 = Point::new(10.0, 2.0);
+        let c2 = Circle::new(p2.clone(), r1);
+
+        c1.draw(&mut chart, BLACK);
+        c2.draw(&mut chart, BLACK);
+
+        let (s1, s2) = c1.external_tangents_circle(&p2);
+        println!("X1 = ({}, {})", s1.first().x, s1.first().y);
+        println!("Y1 = ({}, {})", s1.second().x, s1.second().y);
+        println!("X2 = ({}, {})", s2.first().x, s2.first().y);
+        println!("Y2 = ({}, {})", s2.second().x, s2.second().y);
+        s1.draw(&mut chart, BLUE);
+        s2.draw(&mut chart, BLUE);
+        println!("----------");
+        let (s1, s2) = c1.internal_tangents_circle(&p2).unwrap();
+        println!("A1 = ({}, {})", s1.first().x, s1.first().y);
+        println!("B1 = ({}, {})", s1.second().x, s1.second().y);
+        println!("A2 = ({}, {})", s2.first().x, s2.first().y);
+        println!("B2 = ({}, {})", s2.second().x, s2.second().y);
+        s1.draw(&mut chart, RED);
+        s2.draw(&mut chart, RED);
+
+        let points = vec![
+            Point::new(0.0, 3.0),
+            Point::new(2.0, 2.0),
+            Point::new(1.0, 1.0),
+            Point::new(2.0, 1.0),
+            Point::new(3.0, 0.0),
+            Point::new(0.0, 0.0),
+            Point::new(3.0, 3.0),
+        ];
+
+        let polygon = Polygon::convex_hull(points).unwrap();
+        polygon.draw(&mut chart, GREEN);
+    }
+
+    root.present()?;
+    Ok(())
+}
+
+fn old() {
+    use geometry2d::*;
+    use geomety::*;
+    use sity::*;
+
+    let p1 = Point::new(0.0, 0.0);
+    let r1 = 2.0;
+    let c1 = Circle::new(p1, r1);
+    let p2 = Point::new(10.0, 2.0);
+    let r2 = 2.0;
+    // let c2 = Circle::new(p2, r2);
+
+    let (s1, s2) = c1.external_tangents_circle(&p2);
+    println!("X1 = ({}, {})", s1.first().x, s1.first().y);
+    println!("Y1 = ({}, {})", s1.second().x, s1.second().y);
+    println!("X2 = ({}, {})", s2.first().x, s2.first().y);
+    println!("Y2 = ({}, {})", s2.second().x, s2.second().y);
+    println!("----------");
+    let (s1, s2) = c1.internal_tangents_circle(&p2).unwrap();
+    println!("A1 = ({}, {})", s1.first().x, s1.first().y);
+    println!("B1 = ({}, {})", s1.second().x, s1.second().y);
+    println!("A2 = ({}, {})", s2.first().x, s2.first().y);
+    println!("B2 = ({}, {})", s2.second().x, s2.second().y);
+
+    // assert_eq!(t1.is_some(), true);
+    // assert_eq!(t2.is_some(), true);
+
+    // let (s1, s2) = t1.unwrap();
+    // println!("{}", s1);
+    // println!("{}", s2);
+
+    // let p1 = Point::new(1.0, 3.0);
+    // let p2 = Point::new(1.0, 1.0);
+    // // let p1 = Position::new(metre(1.0), metre(3.0));
+    // // let p2 = Position::new(metre(1.0), metre(1.0));
+    // let a = p1.angle(&p2);
+    // println!("{}", a);
 
     // let p1 = Point::new(1.0, 2.0);
     // let v1 = Vector::new(3.0, 4.0);
