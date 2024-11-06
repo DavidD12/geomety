@@ -25,6 +25,18 @@ impl<T: Number> From<(T, T)> for Point<T> {
     }
 }
 
+impl<T: Number> Into<(T, T)> for Point<T> {
+    fn into(self) -> (T, T) {
+        (self.x, self.y)
+    }
+}
+
+impl<T: Number> Into<(T, T)> for &Point<T> {
+    fn into(self) -> (T, T) {
+        (self.x, self.y)
+    }
+}
+
 //-------------------------------------------------- ToValue --------------------------------------------------
 
 impl<T> Point<T>
@@ -42,7 +54,12 @@ impl<T> Point<T>
 where
     T: Number,
 {
-    pub fn translate(&self, dx: T, dy: T) -> Self {
+    pub fn translate(&mut self, dx: T, dy: T) {
+        self.x += dx;
+        self.y += dy;
+    }
+
+    pub fn translated(&self, dx: T, dy: T) -> Self {
         Self {
             x: self.x + dx,
             y: self.y + dy,
@@ -551,6 +568,7 @@ where
 impl<T> Point<T>
 where
     T: Number + AngleFactory,
+    <T as HasValue>::Output: AngleOps,
 {
     pub fn angle(&self, other: &Self) -> Radian<<T as HasValue>::Output> {
         (other.y - self.y).atan2(other.x - self.x)

@@ -62,11 +62,16 @@ impl<T> Segment<T>
 where
     T: Number,
 {
-    pub fn translate(&self, dx: T, dy: T) -> Self {
+    pub fn translate(&mut self, dx: T, dy: T) {
+        self.points.0.translate(dx, dy);
+        self.points.1.translate(dx, dy);
+    }
+
+    pub fn translated(&self, dx: T, dy: T) -> Self {
         Self {
             points: (
-                self.first().translate(dx, dy),
-                self.second().translate(dx, dy),
+                self.first().translated(dx, dy),
+                self.second().translated(dx, dy),
             ),
         }
     }

@@ -2,7 +2,6 @@ use super::*;
 use sity::*;
 use std::fmt::Display;
 use std::ops::*;
-use std::process::Output;
 
 #[derive(Debug, Clone, PartialEq, Default)]
 pub struct Circle<T: Number> {
@@ -42,6 +41,24 @@ where
 {
     pub fn to_value(&self) -> Circle<<T as HasValue>::Output> {
         Circle::new(self.center.to_value(), self.radius.value())
+    }
+}
+
+//-------------------------------------------------- Translate --------------------------------------------------
+
+impl<T> Circle<T>
+where
+    T: Number,
+{
+    pub fn translate(&mut self, dx: T, dy: T) {
+        self.center.translate(dx, dy);
+    }
+
+    pub fn translated(&self, dx: T, dy: T) -> Self {
+        Self {
+            center: self.center.translated(dx, dy),
+            radius: self.radius,
+        }
     }
 }
 
@@ -158,20 +175,6 @@ where
     fn sub(self, rhs: &Vector<T>) -> Self::Output {
         Self::Output {
             center: self.center() - rhs,
-            radius: self.radius,
-        }
-    }
-}
-
-//-------------------------------------------------- Translate --------------------------------------------------
-
-impl<T> Circle<T>
-where
-    T: Number,
-{
-    pub fn translate(&self, dx: T, dy: T) -> Self {
-        Self {
-            center: self.center.translate(dx, dy),
             radius: self.radius,
         }
     }
@@ -507,7 +510,7 @@ where
 
 //-------------------------------------------------- Display --------------------------------------------------
 
-impl<T: Number + Display> Display for Circle<T> {
+impl<T: Number> Display for Circle<T> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "Circle({}, {})", self.center, self.radius)
     }

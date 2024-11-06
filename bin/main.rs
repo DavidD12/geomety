@@ -1,6 +1,115 @@
-use plotters::prelude::*;
+use geomety::geometry2d::*;
+use sity::*;
 
-fn main() -> Result<(), Box<dyn std::error::Error>> {
+fn main() {
+    let radius = metre(0.5);
+    let p1 = Point::new(metre(2.0), metre(1.0));
+    let c1 = Circle::new(p1, radius);
+    let d1 = DirectedCircle::new(c1, Direction::CounterClockWise);
+    let p2 = Point::new(metre(4.0), metre(2.0));
+    let c2 = Circle::new(p2.clone(), radius);
+    let seg = d1.tangents_to_circle(&p2, Direction::ClockWise).unwrap();
+
+    let p = Point::new(metre(0.0), metre(3.0));
+    let c = Circle::new(p, metre(0.75));
+    let start_angle = Radian::new(0.0);
+    let finish_angle = Radian::new(f64::PI / 2.0);
+    let arc = DirectedArc::new(c, (start_angle, finish_angle));
+
+    let p = Point::new(metre(0.0), metre(3.0));
+    let v = Vector::new(metre(0.5), metre(0.5));
+    let pose = Pose::new(p, v);
+
+    {
+        use plotters::prelude::*;
+        let root = BitMapBackend::new("geometrie.png", (1000, 1000)).into_drawing_area();
+        root.fill(&WHITE).unwrap();
+
+        let x_min = -1.0;
+        let x_max = 5.0;
+        let y_min = -1.0;
+        let y_max = 5.0;
+
+        let mut chart: ChartContext<
+            '_,
+            BitMapBackend<'_>,
+            Cartesian2d<
+                plotters::coord::types::RangedCoordf64,
+                plotters::coord::types::RangedCoordf64,
+            >,
+        > = ChartBuilder::on(&root)
+            // .caption("y=x^2", ("sans-serif", 50).into_font())
+            .margin(5)
+            .x_label_area_size(50)
+            .y_label_area_size(50)
+            .build_cartesian_2d(x_min..x_max, y_min..y_max)
+            .unwrap();
+        chart.configure_mesh().draw().unwrap();
+        //
+        d1.circle().draw(&mut chart, BLACK);
+        c2.draw(&mut chart, BLACK);
+        seg.draw(&mut chart, BLUE.stroke_width(2));
+        arc.draw(&mut chart, RED.stroke_width(2));
+        arc.start_point().draw(&mut chart, BLACK, 5);
+        arc.finish_point().draw(&mut chart, GREEN, 5);
+        pose.draw(&mut chart, GREEN, 5, GREEN.stroke_width(2));
+        //
+        root.present().unwrap();
+    }
+}
+
+fn plot_poly() {
+    let p1 = Point::new(metre(1.0), metre(0.0));
+    let p2 = Point::new(metre(4.0), metre(2.0));
+    let p3 = Point::new(metre(3.0), metre(4.0));
+    let p4 = Point::new(metre(1.0), metre(3.0));
+    let p5 = Point::new(metre(0.0), metre(1.0));
+    let points = vec![p1, p2, p3, p4, p5];
+    let p = Polygon::convex_hull(points).unwrap();
+    let center = p.center();
+    //
+    let direction = Vector::new(metre(1.0), metre(0.0));
+    let segments = p.mapping(&direction, metre(0.25));
+
+    {
+        use plotters::prelude::*;
+        let root = BitMapBackend::new("geometrie.png", (1000, 1000)).into_drawing_area();
+        root.fill(&WHITE).unwrap();
+
+        let x_min = -1.0;
+        let x_max = 5.0;
+        let y_min = -1.0;
+        let y_max = 5.0;
+
+        let mut chart: ChartContext<
+            '_,
+            BitMapBackend<'_>,
+            Cartesian2d<
+                plotters::coord::types::RangedCoordf64,
+                plotters::coord::types::RangedCoordf64,
+            >,
+        > = ChartBuilder::on(&root)
+            // .caption("y=x^2", ("sans-serif", 50).into_font())
+            .margin(5)
+            .x_label_area_size(50)
+            .y_label_area_size(50)
+            .build_cartesian_2d(x_min..x_max, y_min..y_max)
+            .unwrap();
+        chart.configure_mesh().draw().unwrap();
+        //
+        p.draw(&mut chart, BLACK);
+        center.draw(&mut chart, RED, 5);
+        for seg in segments.iter() {
+            seg.draw(&mut chart, BLUE);
+        }
+        //
+        root.present().unwrap();
+    }
+}
+
+fn plot_circle_tangents() -> Result<(), Box<dyn std::error::Error>> {
+    use plotters::prelude::*;
+
     // Création d'une zone de dessin
     let root = BitMapBackend::new("geometrie.png", (1000, 1000)).into_drawing_area();
     root.fill(&WHITE)?;
@@ -70,29 +179,6 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 }
 
 fn old() {
-    use geometry2d::*;
-    use geomety::*;
-    use sity::*;
-
-    let p1 = Point::new(0.0, 0.0);
-    let r1 = 2.0;
-    let c1 = Circle::new(p1, r1);
-    let p2 = Point::new(10.0, 2.0);
-    let r2 = 2.0;
-    // let c2 = Circle::new(p2, r2);
-
-    let (s1, s2) = c1.external_tangents_circle(&p2);
-    println!("X1 = ({}, {})", s1.first().x, s1.first().y);
-    println!("Y1 = ({}, {})", s1.second().x, s1.second().y);
-    println!("X2 = ({}, {})", s2.first().x, s2.first().y);
-    println!("Y2 = ({}, {})", s2.second().x, s2.second().y);
-    println!("----------");
-    let (s1, s2) = c1.internal_tangents_circle(&p2).unwrap();
-    println!("A1 = ({}, {})", s1.first().x, s1.first().y);
-    println!("B1 = ({}, {})", s1.second().x, s1.second().y);
-    println!("A2 = ({}, {})", s2.first().x, s2.first().y);
-    println!("B2 = ({}, {})", s2.second().x, s2.second().y);
-
     // assert_eq!(t1.is_some(), true);
     // assert_eq!(t2.is_some(), true);
 

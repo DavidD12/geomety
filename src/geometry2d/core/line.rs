@@ -50,9 +50,13 @@ impl<T> Line<T>
 where
     T: Number,
 {
-    pub fn translate(&self, dx: T, dy: T) -> Self {
+    pub fn translate(&mut self, dx: T, dy: T) {
+        self.point.translate(dx, dy);
+    }
+
+    pub fn translated(&self, dx: T, dy: T) -> Self {
         Self {
-            point: self.point.translate(dx, dy),
+            point: self.point.translated(dx, dy),
             vector: self.vector.clone(),
         }
     }
@@ -478,11 +482,20 @@ where
     T: Mul<<<T as Mul>::Output as Div>::Output, Output = T>,
 {
     pub fn intersection_to_polygon(&self, other: &Polygon<T>) -> Vec<Point<T>> {
-        other
+        let points = other
             .segments()
             .iter()
             .filter_map(|seg| self.intersection_to_segment(seg))
-            .collect()
+            .collect::<Vec<_>>();
+
+        // unicity
+        let mut v = vec![];
+        for pt in points.iter() {
+            if !v.contains(pt) {
+                v.push(pt.clone());
+            }
+        }
+        v
     }
 }
 

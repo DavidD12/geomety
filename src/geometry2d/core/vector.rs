@@ -512,6 +512,29 @@ where
     }
 }
 
+//-------------------------------------------------- Scale --------------------------------------------------
+
+impl<T> Vector<T>
+where
+    T: Number,
+    // length
+    T: Pow2,
+    <T as Pow2>::Output: Number,
+    <T as Pow2>::Output: Root2<Output = T>,
+    // /
+    T: Div<<T as HasValue>::Output, Output = T>,
+    // *
+    T: Mul<<T as HasValue>::Output, Output = T>,
+{
+    pub fn scale(&self, length: T) -> Self {
+        let v = self.normalized();
+        Self {
+            dx: v.dx * length.value(),
+            dy: v.dy * length.value(),
+        }
+    }
+}
+
 //-------------------------------------------------- Perpendcular --------------------------------------------------
 
 impl<T> Vector<T>

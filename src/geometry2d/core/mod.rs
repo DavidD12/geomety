@@ -1,6 +1,9 @@
 pub mod orientation;
 pub use orientation::*;
 
+pub mod rotation;
+pub use rotation::*;
+
 pub mod point;
 pub use point::*;
 
@@ -19,8 +22,20 @@ pub use polygon::*;
 pub mod circle;
 pub use circle::*;
 
+pub mod directed_circle;
+pub use directed_circle::*;
+
+pub mod directed_arc;
+pub use directed_arc::*;
+
+pub mod pose;
+pub use pose::*;
+
+pub mod trajectory;
+pub use trajectory::*;
+
 pub mod plot;
-pub use plot::*;
+// pub use plot::*;
 
 use sity::*;
 

@@ -1,5 +1,6 @@
 use std::cmp::Ordering;
 use std::ops::*;
+use std::process::Output;
 
 use super::*;
 use sity::*;
@@ -19,6 +20,7 @@ impl<T: Number> Polygon<T> {
 impl<T> Polygon<T>
 where
     T: Number + AngleFactory,
+    <T as HasValue>::Output: AngleOps,
     T: Mul,
     <T as Mul>::Output: Number,
     T: Pow2<Output = <T as Mul>::Output>,
@@ -100,6 +102,28 @@ where
             self.points.first().unwrap().clone(),
         ));
         segments
+    }
+}
+
+//-------------------------------------------------- Center --------------------------------------------------
+
+impl<T> Polygon<T>
+where
+    T: Number,
+    <T as HasValue>::Output: FromValue<usize>,
+    T: DivAssign<<T as HasValue>::Output>,
+{
+    pub fn center(&self) -> Point<T> {
+        let mut x = T::ZERO;
+        let mut y = T::ZERO;
+        for point in self.points.iter() {
+            x += point.x;
+            y += point.y;
+        }
+        let l = <T as HasValue>::Output::from_value(self.points.len());
+        x /= l;
+        y /= l;
+        Point { x, y }
     }
 }
 
@@ -303,3 +327,85 @@ where
 }
 
 //-------------------------------------------------- Distance --------------------------------------------------
+
+// TODO
+
+//-------------------------------------------------- Distance --------------------------------------------------
+
+impl<T> Polygon<T>
+where
+    T: Number,
+    // center
+    <T as HasValue>::Output: FromValue<usize>,
+    T: DivAssign<<T as HasValue>::Output>,
+    // projection
+    T: Mul,
+    <T as Mul>::Output: Number,
+    T: Pow2<Output = <T as Mul>::Output>,
+    <T as Mul>::Output: Div,
+    <<T as Mul>::Output as Div>::Output: Number,
+    T: Mul<<<T as Mul>::Output as Div>::Output, Output = T>,
+    // Distance
+    <T as Pow2>::Output: Root2<Output = T>,
+    // Normalized
+    T: Div<<T as HasValue>::Output, Output = T>,
+    // Scale
+    T: Mul<<T as HasValue>::Output, Output = T>,
+{
+    pub fn mapping_first_point(&self, direction: &Vector<T>) -> Point<T> {
+        // Collinear segment
+        for seg in self.segments().iter() {
+            let v = seg.to_vector();
+            if direction.is_parallel(&v) {
+                return seg.first().clone();
+            }
+        }
+
+        // External point
+        let (first, others) = self.points.split_first().unwrap();
+        let line = Line::new(first.clone(), direction.clone());
+        let list = line.intersection_to_polygon(self);
+        if list.len() < 2 {
+            return first.clone();
+        }
+        //
+        let mut distance = list[0].distance(&list[1]);
+        let mut point = first.clone();
+        for pt in others.iter() {
+            let list = line.intersection_to_polygon(self);
+            let list = line.intersection_to_polygon(self);
+            if list.len() < 2 {
+                return first.clone();
+            }
+            let d = list[0].distance(&list[1]);
+            if d < distance {
+                point = pt.clone();
+                distance = d;
+            }
+        }
+
+        point
+    }
+
+    pub fn mapping(&self, direction: &Vector<T>, distance: T) -> Vec<Segment<T>> {
+        let mut segments = vec![];
+        let first = self.mapping_first_point(direction);
+        //
+        let center = &self.center();
+        let line = Line::new(first.clone(), direction.clone());
+        let mut point = center.projection_to_line(&line);
+        let v_per: Vector<T> = (&point, center).into();
+        let v_per: Vector<T> = v_per.scale(distance);
+
+        loop {
+            point = point + &v_per;
+            let line = Line::new(point.clone(), direction.clone());
+            let list = line.intersection_to_polygon(self);
+            if list.len() < 2 {
+                return segments;
+            }
+            let segment = Segment::new(list.first().unwrap().clone(), list.last().unwrap().clone());
+            segments.push(segment);
+        }
+    }
+}
