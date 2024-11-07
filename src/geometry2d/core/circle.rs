@@ -201,90 +201,90 @@ where
 /**
  * return external and internal tangent points if exists
  */
-impl<T> Circle<T>
-where
-    T: Number,
-    T: Mul<T>,
-    <T as Mul>::Output: Number,
-    T: Pow2,
-    <T as Pow2>::Output: Number,
-    <T as Pow2>::Output: Root2<Output = T>,
-    <T as Mul>::Output: Div<T, Output = T>,
-    T: Div<T>,
-    <T as Div<T>>::Output: AngleFactory,
-    <T as Div<T>>::Output: HasValue<Output = <T as HasValue>::Output>,
-    <T as HasValue>::Output: AngleOps,
-    T: Mul<<T as HasValue>::Output, Output = T>,
-{
-    pub fn tangents(
-        &self,
-        other: &Circle<T>,
-    ) -> (
-        Option<(Segment<T>, Segment<T>)>,
-        Option<(Segment<T>, Segment<T>)>,
-    ) {
-        let d = self.center.distance(&other.center);
+// impl<T> Circle<T>
+// where
+//     T: Number,
+//     T: Mul<T>,
+//     <T as Mul>::Output: Number,
+//     T: Pow2,
+//     <T as Pow2>::Output: Number,
+//     <T as Pow2>::Output: Root2<Output = T>,
+//     <T as Mul>::Output: Div<T, Output = T>,
+//     T: Div<T>,
+//     <T as Div<T>>::Output: AngleFactory,
+//     <T as Div<T>>::Output: HasValue<Output = <T as HasValue>::Output>,
+//     <T as HasValue>::Output: AngleOps,
+//     T: Mul<<T as HasValue>::Output, Output = T>,
+// {
+//     pub fn tangents(
+//         &self,
+//         other: &Circle<T>,
+//     ) -> (
+//         Option<(Segment<T>, Segment<T>)>,
+//         Option<(Segment<T>, Segment<T>)>,
+//     ) {
+//         let d = self.center.distance(&other.center);
 
-        // External exists
-        if d >= (self.radius() - other.radius()).abs() {
-            let teta = ((other.center().y - self.center().y)
-                / (other.center().x - self.center().x))
-                .atan();
-            println!("teta = {}", teta.to_degrees());
-            let delta = ((other.radius() - self.radius()) / d).asin();
-            println!("delta = {}", delta.to_degrees());
-            // first
-            let alpha = teta + delta;
-            println!("alpha = {}", alpha.to_degrees());
-            let x = self.center().x + self.radius * alpha.cos();
-            let y = self.center().y + self.radius * alpha.sin();
-            let p1 = Point::new(x, y);
-            let x = other.center().x + other.radius * (alpha + Radian::PI).cos();
-            let y = other.center().y + other.radius * (alpha + Radian::PI).sin();
-            let p2 = Point::new(x, y);
-            let first = Segment::new(p1, p2);
-            // second
-            let alpha = teta - delta;
-            println!("alpha = {}", alpha.to_degrees());
-            let x = self.center().x + self.radius * alpha.cos();
-            let y = self.center().y + self.radius * alpha.sin();
-            let p1 = Point::new(x, y);
-            let x = other.center().x + other.radius * (alpha + Radian::PI).cos();
-            let y = other.center().y + other.radius * (alpha + Radian::PI).sin();
-            let p2 = Point::new(x, y);
-            let second = Segment::new(p1, p2);
-            let external = (first, second);
-            // Internal exists
-            if d >= self.radius() + other.radius() {
-                let delta = ((self.radius() + other.radius()) / d).asin();
-                // first
-                let alpha = teta + delta;
-                let x = self.center().x + self.radius * alpha.cos();
-                let y = self.center().y + self.radius * alpha.sin();
-                let p1 = Point::new(x, y);
-                let x = other.center().x + other.radius * (alpha + Radian::PI).cos();
-                let y = other.center().y + other.radius * (alpha + Radian::PI).sin();
-                let p2 = Point::new(x, y);
-                let first = Segment::new(p1, p2);
-                // second
-                let alpha = teta - delta;
-                let x = self.center().x + self.radius * alpha.cos();
-                let y = self.center().y + self.radius * alpha.sin();
-                let p1 = Point::new(x, y);
-                let x = other.center().x + other.radius * (alpha + Radian::PI).cos();
-                let y = other.center().y + other.radius * (alpha + Radian::PI).sin();
-                let p2 = Point::new(x, y);
-                let second = Segment::new(p1, p2);
-                let internal = (first, second);
-                (Some(external), Some(internal))
-            } else {
-                (Some(external), None)
-            }
-        } else {
-            (None, None)
-        }
-    }
-}
+//         // External exists
+//         if d >= (self.radius() - other.radius()).abs() {
+//             let teta = ((other.center().y - self.center().y)
+//                 / (other.center().x - self.center().x))
+//                 .atan();
+//             println!("teta = {}", teta.to_degrees());
+//             let delta = ((other.radius() - self.radius()) / d).asin();
+//             println!("delta = {}", delta.to_degrees());
+//             // first
+//             let alpha = teta + delta;
+//             println!("alpha = {}", alpha.to_degrees());
+//             let x = self.center().x + self.radius * alpha.cos();
+//             let y = self.center().y + self.radius * alpha.sin();
+//             let p1 = Point::new(x, y);
+//             let x = other.center().x + other.radius * (alpha + Radian::PI).cos();
+//             let y = other.center().y + other.radius * (alpha + Radian::PI).sin();
+//             let p2 = Point::new(x, y);
+//             let first = Segment::new(p1, p2);
+//             // second
+//             let alpha = teta - delta;
+//             println!("alpha = {}", alpha.to_degrees());
+//             let x = self.center().x + self.radius * alpha.cos();
+//             let y = self.center().y + self.radius * alpha.sin();
+//             let p1 = Point::new(x, y);
+//             let x = other.center().x + other.radius * (alpha + Radian::PI).cos();
+//             let y = other.center().y + other.radius * (alpha + Radian::PI).sin();
+//             let p2 = Point::new(x, y);
+//             let second = Segment::new(p1, p2);
+//             let external = (first, second);
+//             // Internal exists
+//             if d >= self.radius() + other.radius() {
+//                 let delta = ((self.radius() + other.radius()) / d).asin();
+//                 // first
+//                 let alpha = teta + delta;
+//                 let x = self.center().x + self.radius * alpha.cos();
+//                 let y = self.center().y + self.radius * alpha.sin();
+//                 let p1 = Point::new(x, y);
+//                 let x = other.center().x + other.radius * (alpha + Radian::PI).cos();
+//                 let y = other.center().y + other.radius * (alpha + Radian::PI).sin();
+//                 let p2 = Point::new(x, y);
+//                 let first = Segment::new(p1, p2);
+//                 // second
+//                 let alpha = teta - delta;
+//                 let x = self.center().x + self.radius * alpha.cos();
+//                 let y = self.center().y + self.radius * alpha.sin();
+//                 let p1 = Point::new(x, y);
+//                 let x = other.center().x + other.radius * (alpha + Radian::PI).cos();
+//                 let y = other.center().y + other.radius * (alpha + Radian::PI).sin();
+//                 let p2 = Point::new(x, y);
+//                 let second = Segment::new(p1, p2);
+//                 let internal = (first, second);
+//                 (Some(external), Some(internal))
+//             } else {
+//                 (Some(external), None)
+//             }
+//         } else {
+//             (None, None)
+//         }
+//     }
+// }
 
 impl<T> Circle<T>
 where
@@ -389,124 +389,124 @@ where
     }
 }
 
-impl<T> Circle<T>
-where
-    // distance
-    T: Number,
-    T: Pow2,
-    <T as Pow2>::Output: Number,
-    T: Mul<T, Output = <T as Pow2>::Output>,
-    <T as Mul>::Output: Number,
-    <T as Pow2>::Output: Root2<Output = T>,
-    // o
-    T: Pow3,
-    <T as Pow2>::Output: Mul<T, Output = <T as Pow3>::Output>,
-    T: Pow4,
-    <T as Pow3>::Output: Mul<T, Output = <T as Pow4>::Output>,
-    <T as Pow4>::Output: Root2<Output = <T as Pow2>::Output>,
-    // xa
-    T: Div<<T as HasValue>::Output, Output = T>,
-    T: Mul<<T as Pow2>::Output, Output = <T as Pow3>::Output>,
-    <T as HasValue>::Output: Mul<<T as Pow2>::Output, Output = <T as Pow2>::Output>,
-    <T as Pow3>::Output: Div<<T as Pow2>::Output, Output = T>,
-    // xb
-    <T as HasValue>::Output: Mul<T, Output = T>,
-{
-    pub fn internal_tangents(&self, other: &Circle<T>) -> Option<(Segment<T>, Segment<T>)> {
-        let d = self.center.distance(&other.center);
-        // External exists
-        if d > (self.radius() - other.radius()).abs() {
-            let two = (T::ONE + T::ONE).value();
-            let four = two + two;
-            let quarter = (T::ONE).value() / four;
-            let l = (d.pow2() - (self.radius + other.radius()).pow2()).root2();
-            let r = (l.pow2() + other.radius.pow2()).root2();
-            let o = quarter
-                * ((d + self.radius + r)
-                    * (d + self.radius - r)
-                    * (d - self.radius + r)
-                    * (self.radius + r - d))
-                    .root2();
-            //
-            // x1
-            let a = (self.center.x + other.center.x) / two;
-            let b = ((other.center.x - self.center.x) * (self.radius.pow2() - r.pow2())
-                / (two * d.pow2()));
-            let c = two * (self.center.y - other.center.y) * o / d.pow2();
-            let x1 = a + b + c;
-            // y1
-            let a = (self.center.y + other.center.y) / two;
-            let b = ((other.center.y - self.center.y) * (self.radius.pow2() - r.pow2())
-                / (two * d.pow2()));
-            let c = two * (self.center.x - other.center.x) * o / d.pow2();
-            let y1 = a + b + c;
-            let pt11 = Point::new(x1, y1);
-            println!("pt1a = {}", pt11);
-            //
-            let x1 = a + b - c;
-            let y1 = a + b - c;
-            let pt12 = Point::new(x1, y1);
-            println!("pt1a = {}", pt12);
-            // -----
+// impl<T> Circle<T>
+// where
+//     // distance
+//     T: Number,
+//     T: Pow2,
+//     <T as Pow2>::Output: Number,
+//     T: Mul<T, Output = <T as Pow2>::Output>,
+//     <T as Mul>::Output: Number,
+//     <T as Pow2>::Output: Root2<Output = T>,
+//     // o
+//     T: Pow3,
+//     <T as Pow2>::Output: Mul<T, Output = <T as Pow3>::Output>,
+//     T: Pow4,
+//     <T as Pow3>::Output: Mul<T, Output = <T as Pow4>::Output>,
+//     <T as Pow4>::Output: Root2<Output = <T as Pow2>::Output>,
+//     // xa
+//     T: Div<<T as HasValue>::Output, Output = T>,
+//     T: Mul<<T as Pow2>::Output, Output = <T as Pow3>::Output>,
+//     <T as HasValue>::Output: Mul<<T as Pow2>::Output, Output = <T as Pow2>::Output>,
+//     <T as Pow3>::Output: Div<<T as Pow2>::Output, Output = T>,
+//     // xb
+//     <T as HasValue>::Output: Mul<T, Output = T>,
+// {
+//     pub fn internal_tangents(&self, other: &Circle<T>) -> Option<(Segment<T>, Segment<T>)> {
+//         let d = self.center.distance(&other.center);
+//         // External exists
+//         if d > (self.radius() - other.radius()).abs() {
+//             let two = (T::ONE + T::ONE).value();
+//             let four = two + two;
+//             let quarter = (T::ONE).value() / four;
+//             let l = (d.pow2() - (self.radius + other.radius()).pow2()).root2();
+//             let r = (l.pow2() + other.radius.pow2()).root2();
+//             let o = quarter
+//                 * ((d + self.radius + r)
+//                     * (d + self.radius - r)
+//                     * (d - self.radius + r)
+//                     * (self.radius + r - d))
+//                     .root2();
+//             //
+//             // x1
+//             let a = (self.center.x + other.center.x) / two;
+//             let b = ((other.center.x - self.center.x) * (self.radius.pow2() - r.pow2())
+//                 / (two * d.pow2()));
+//             let c = two * (self.center.y - other.center.y) * o / d.pow2();
+//             let x1 = a + b + c;
+//             // y1
+//             let a = (self.center.y + other.center.y) / two;
+//             let b = ((other.center.y - self.center.y) * (self.radius.pow2() - r.pow2())
+//                 / (two * d.pow2()));
+//             let c = two * (self.center.x - other.center.x) * o / d.pow2();
+//             let y1 = a + b + c;
+//             let pt11 = Point::new(x1, y1);
+//             println!("pt1a = {}", pt11);
+//             //
+//             let x1 = a + b - c;
+//             let y1 = a + b - c;
+//             let pt12 = Point::new(x1, y1);
+//             println!("pt1a = {}", pt12);
+//             // -----
 
-            // -----
-            None
-        } else {
-            None
-        }
-    }
-}
+//             // -----
+//             None
+//         } else {
+//             None
+//         }
+//     }
+// }
 
-impl<T> Circle<T>
-where
-    T: Number,
-    T: Mul<T>,
-    <T as Mul>::Output: Number,
-    T: Pow2,
-    <T as Pow2>::Output: Number,
-    <T as Pow2>::Output: Root2<Output = T>,
-    <T as Mul>::Output: Div<T, Output = T>,
-    T: Div<T>,
-    <T as Div<T>>::Output: AngleFactory,
-    <T as Div<T>>::Output: HasValue<Output = <T as HasValue>::Output>,
-    <T as HasValue>::Output: AngleOps,
-    T: Mul<<T as HasValue>::Output, Output = T>,
-{
-    pub fn external_tangents(&self, other: &Circle<T>) -> Option<(Segment<T>, Segment<T>)> {
-        let d = self.center.distance(&other.center);
+// impl<T> Circle<T>
+// where
+//     T: Number,
+//     T: Mul<T>,
+//     <T as Mul>::Output: Number,
+//     T: Pow2,
+//     <T as Pow2>::Output: Number,
+//     <T as Pow2>::Output: Root2<Output = T>,
+//     <T as Mul>::Output: Div<T, Output = T>,
+//     T: Div<T>,
+//     <T as Div<T>>::Output: AngleFactory,
+//     <T as Div<T>>::Output: HasValue<Output = <T as HasValue>::Output>,
+//     <T as HasValue>::Output: AngleOps,
+//     T: Mul<<T as HasValue>::Output, Output = T>,
+// {
+//     pub fn external_tangents(&self, other: &Circle<T>) -> Option<(Segment<T>, Segment<T>)> {
+//         let d = self.center.distance(&other.center);
 
-        // // Internal exists
-        // if d > self.radius() + other.radius() {
-        //     let teta = ((other.center().y - self.center().y)
-        //         / (other.center().x - self.center().x))
-        //         .atan();
-        //     let delta = ((other.radius() + self.radius()) / d).asin();
-        //     // first
-        //     let alpha = teta + delta;
-        //     let x = self.center().x + self.radius * alpha.cos();
-        //     let y = self.center().y + self.radius * alpha.sin();
-        //     let p1 = Point::new(x, y);
-        //     let x = self.center().x + self.radius * (alpha.cos() + <T as HasValue>::Output::PI);
-        //     let y = self.center().y + self.radius * (alpha.sin() + <T as HasValue>::Output::PI);
-        //     let p2 = Point::new(x, y);
-        //     let first = Segment::new(p1, p2);
-        //     // second
-        //     let alpha = teta - delta;
-        //     let x = self.center().x + self.radius * alpha.cos();
-        //     let y = self.center().y + self.radius * alpha.sin();
-        //     let p1 = Point::new(x, y);
-        //     let x = self.center().x + self.radius * (alpha.cos() + <T as HasValue>::Output::PI);
-        //     let y = self.center().y + self.radius * (alpha.sin() + <T as HasValue>::Output::PI);
-        //     let p2 = Point::new(x, y);
-        //     let second = Segment::new(p1, p2);
-        //     let internal = (first, second);
-        //     Some(internal)
-        // } else {
-        //     None
-        // }
-        todo!()
-    }
-}
+//         // Internal exists
+//         if d > self.radius() + other.radius() {
+//             let teta = ((other.center().y - self.center().y)
+//                 / (other.center().x - self.center().x))
+//                 .atan();
+//             let delta = ((other.radius() + self.radius()) / d).asin();
+//             // first
+//             let alpha = teta + delta;
+//             let x = self.center().x + self.radius * alpha.cos();
+//             let y = self.center().y + self.radius * alpha.sin();
+//             let p1 = Point::new(x, y);
+//             let x = self.center().x + self.radius * (alpha.cos() + <T as HasValue>::Output::PI);
+//             let y = self.center().y + self.radius * (alpha.sin() + <T as HasValue>::Output::PI);
+//             let p2 = Point::new(x, y);
+//             let first = Segment::new(p1, p2);
+//             // second
+//             let alpha = teta - delta;
+//             let x = self.center().x + self.radius * alpha.cos();
+//             let y = self.center().y + self.radius * alpha.sin();
+//             let p1 = Point::new(x, y);
+//             let x = self.center().x + self.radius * (alpha.cos() + <T as HasValue>::Output::PI);
+//             let y = self.center().y + self.radius * (alpha.sin() + <T as HasValue>::Output::PI);
+//             let p2 = Point::new(x, y);
+//             let second = Segment::new(p1, p2);
+//             let internal = (first, second);
+//             Some(internal)
+//         } else {
+//             None
+//         }
+//         todo!()
+//     }
+// }
 
 //-------------------------------------------------- Display --------------------------------------------------
 

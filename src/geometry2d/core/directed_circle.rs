@@ -330,29 +330,30 @@ where
 impl<T> DirectedCircle<T>
 where
     T: Number,
+    //
+    <T as HasValue>::Output: Mul<T, Output = T>,
+    <T as HasValue>::Output: Mul<<T as Pow2>::Output, Output = <T as Pow2>::Output>,
+    //
+    T: std::ops::Neg<Output = T>,
+    //
+    T: Mul<<T as HasValue>::Output, Output = T>,
+    T: Mul<T, Output = <T as Pow2>::Output>,
+    T: Mul<<T as Pow2>::Output, Output = <T as Pow3>::Output>,
+    //
+    T: Div<<T as HasValue>::Output, Output = T>,
+    T: DivAssign<<T as HasValue>::Output>,
+    //
     T: Pow2,
     <T as Pow2>::Output: Number,
     <T as Pow2>::Output: Root2<Output = T>,
-    T: DivAssign<<T as HasValue>::Output>,
-    T: std::ops::Neg<Output = T>,
-    T: Mul<<T as HasValue>::Output, Output = T>,
     //
-    T: Mul<T, Output = <T as Pow2>::Output>,
-    <T as Mul>::Output: Number,
-    <T as Pow2>::Output: Root2<Output = T>,
-    // o
     T: Pow3,
     <T as Pow2>::Output: Mul<T, Output = <T as Pow3>::Output>,
-    T: Pow4,
     <T as Pow3>::Output: Mul<T, Output = <T as Pow4>::Output>,
-    <T as Pow4>::Output: Root2<Output = <T as Pow2>::Output>,
-    // xa
-    T: Div<<T as HasValue>::Output, Output = T>,
-    T: Mul<<T as Pow2>::Output, Output = <T as Pow3>::Output>,
-    <T as HasValue>::Output: Mul<<T as Pow2>::Output, Output = <T as Pow2>::Output>,
     <T as Pow3>::Output: Div<<T as Pow2>::Output, Output = T>,
-    // xb
-    <T as HasValue>::Output: Mul<T, Output = T>,
+    //
+    T: Pow4,
+    <T as Pow4>::Output: Root2<Output = <T as Pow2>::Output>,
 {
     pub fn tangents_to_circle(&self, point: &Point<T>, direction: Direction) -> Option<Segment<T>> {
         if self.direction == direction {

@@ -336,12 +336,11 @@ where
 impl<T> Distance<T, Point<T>> for Line<T>
 where
     T: Number,
-    T: Mul,
-    <T as Mul>::Output: Number,
     T: Pow2,
+    T: Mul<T, Output = <T as Pow2>::Output>,
     <T as Pow2>::Output: Number,
     <T as Pow2>::Output: Root2<Output = T>,
-    <T as Mul>::Output: Div<T, Output = T>,
+    <T as Pow2>::Output: Div<T, Output = T>,
 {
     fn distance(&self, other: &Point<T>) -> T {
         other.distance(self)
@@ -351,10 +350,13 @@ where
 impl<T> Distance<T, Line<T>> for Line<T>
 where
     T: Number,
-    T: Mul,
-    <T as Mul>::Output: Number,
     T: Pow2,
+    T: Mul<T, Output = <T as Pow2>::Output>,
     <T as Pow2>::Output: Number,
+    <T as Pow2>::Output: Div,
+    <<T as Pow2>::Output as Div>::Output: Number,
+    T: Mul<<<T as Pow2>::Output as Div>::Output, Output = T>,
+    //
     <T as Pow2>::Output: Root2<Output = T>,
     <T as Mul>::Output: Div<T, Output = T>,
 {
@@ -370,13 +372,13 @@ where
 impl<T> Distance<T, Segment<T>> for Line<T>
 where
     T: Number,
-    T: Mul,
-    <T as Mul>::Output: Number,
-    <T as Mul>::Output: Div,
-    <<T as Mul>::Output as Div>::Output: Number,
-    T: Mul<<<T as Mul>::Output as Div>::Output, Output = T>,
     T: Pow2,
+    T: Mul<T, Output = <T as Pow2>::Output>,
     <T as Pow2>::Output: Number,
+    <T as Pow2>::Output: Div,
+    <<T as Pow2>::Output as Div>::Output: Number,
+    T: Mul<<<T as Pow2>::Output as Div>::Output, Output = T>,
+    //
     <T as Pow2>::Output: Root2<Output = T>,
     <T as Mul>::Output: Div<T, Output = T>,
 {
@@ -395,8 +397,9 @@ where
 impl<T> IsParallel<Line<T>> for Line<T>
 where
     T: Number,
-    T: Mul,
-    <T as Mul>::Output: Number,
+    T: Pow2,
+    T: Mul<T, Output = <T as Pow2>::Output>,
+    <T as Pow2>::Output: Number,
 {
     fn is_parallel(&self, other: &Line<T>) -> bool {
         self.vector.is_parallel(&other.vector)
@@ -406,8 +409,9 @@ where
 impl<T> IsParallel<Segment<T>> for Line<T>
 where
     T: Number,
-    T: Mul,
-    <T as Mul>::Output: Number,
+    T: Pow2,
+    T: Mul<T, Output = <T as Pow2>::Output>,
+    <T as Pow2>::Output: Number,
 {
     fn is_parallel(&self, other: &Segment<T>) -> bool {
         let v = other.to_vector();
@@ -420,11 +424,12 @@ where
 impl<T> Line<T>
 where
     T: Number,
-    T: Mul,
-    <T as Mul>::Output: Number,
-    <T as Mul>::Output: Div,
-    <<T as Mul>::Output as Div>::Output: Number,
-    T: Mul<<<T as Mul>::Output as Div>::Output, Output = T>,
+    T: Pow2,
+    T: Mul<T, Output = <T as Pow2>::Output>,
+    <T as Pow2>::Output: Number,
+    <T as Pow2>::Output: Div,
+    <<T as Pow2>::Output as Div>::Output: Number,
+    T: Mul<<<T as Pow2>::Output as Div>::Output, Output = T>,
 {
     pub fn intersection(&self, other: &Self) -> Option<Point<T>> {
         let den = self.vector.cross_product(&other.vector);
@@ -444,23 +449,26 @@ where
 impl<T> Line<T>
 where
     T: Number,
-    T: Mul,
-    <T as Mul>::Output: Number,
-    <T as Mul>::Output: Div,
-    <<T as Mul>::Output as Div>::Output: Number,
-    T: Mul<<<T as Mul>::Output as Div>::Output, Output = T>,
+    //
+    T: Mul<T, Output = <T as Pow2>::Output>,
+    T: Mul<<<T as Pow2>::Output as Div>::Output, Output = T>,
+    //
+    T: Pow2,
+    <T as Pow2>::Output: Number,
+    <T as Pow2>::Output: Div,
+    <<T as Pow2>::Output as Div>::Output: Number,
 {
     pub fn intersection_to_segment(&self, other: &Segment<T>) -> Option<Point<T>> {
         let seg_v = other.to_vector();
         let den = self.vector.cross_product(&seg_v);
-        if den.abs() <= <<T as Mul>::Output as Sub>::Output::EPSILON {
+        if den.abs() <= <T as Pow2>::Output::EPSILON {
             None
         } else {
             let v: Vector<_> = (&self.point, other.first()).into();
             let t = v.cross_product(&seg_v) / den;
             let u = v.cross_product(&self.vector) / den;
-            if u >= <<<T as Mul>::Output as Sub>::Output as Div>::Output::ZERO
-                && u <= <<<T as Mul>::Output as Sub>::Output as Div>::Output::ONE
+            if u >= <<T as Pow2>::Output as Div>::Output::ZERO
+                && u <= <<T as Pow2>::Output as Div>::Output::ONE
             {
                 let delta = self.vector() * t;
                 let x = self.point() + delta;
@@ -475,11 +483,14 @@ where
 impl<T> Line<T>
 where
     T: Number,
-    T: Mul,
-    <T as Mul>::Output: Number,
-    <T as Mul>::Output: Div,
-    <<T as Mul>::Output as Div>::Output: Number,
-    T: Mul<<<T as Mul>::Output as Div>::Output, Output = T>,
+    //
+    T: Mul<T, Output = <T as Pow2>::Output>,
+    T: Mul<<<T as Pow2>::Output as Div>::Output, Output = T>,
+    //
+    T: Pow2,
+    <T as Pow2>::Output: Number,
+    <T as Pow2>::Output: Div,
+    <<T as Pow2>::Output as Div>::Output: Number,
 {
     pub fn intersection_to_polygon(&self, other: &Polygon<T>) -> Vec<Point<T>> {
         let points = other

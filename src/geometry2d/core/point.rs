@@ -1,5 +1,6 @@
 use super::*;
 use sity::*;
+use std::collections::HashMap;
 use std::fmt::Display;
 use std::ops::{Add, Div, Mul, Sub};
 
@@ -48,6 +49,16 @@ where
     }
 }
 
+//-------------------------------------------------- ToVector --------------------------------------------------
+
+impl<T> Point<T>
+where
+    T: Number,
+{
+    pub fn to_vector(&self) -> Vector<T> {
+        Vector::new(self.x, self.y)
+    }
+}
 //-------------------------------------------------- Translate --------------------------------------------------
 
 impl<T> Point<T>
@@ -419,12 +430,11 @@ where
 impl<T> Distance<T, Line<T>> for Point<T>
 where
     T: Number,
-    T: Mul,
-    <T as Mul>::Output: Number,
     T: Pow2,
+    T: Mul<T, Output = <T as Pow2>::Output>,
     <T as Pow2>::Output: Number,
     <T as Pow2>::Output: Root2<Output = T>,
-    <T as Mul>::Output: Div<T, Output = T>,
+    <T as Pow2>::Output: Div<T, Output = T>,
 {
     fn distance(&self, other: &Line<T>) -> T {
         let w: Vector<_> = (self, other.point()).into();
@@ -517,12 +527,13 @@ where
 impl<T> Point<T>
 where
     T: Number,
-    T: Mul,
-    <T as Mul>::Output: Number,
-    T: Pow2<Output = <T as Mul>::Output>,
-    <T as Mul>::Output: Div,
-    <<T as Mul>::Output as Div>::Output: Number,
-    T: Mul<<<T as Mul>::Output as Div>::Output, Output = T>,
+
+    T: Pow2,
+    T: Mul<T, Output = <T as Pow2>::Output>,
+    <T as Pow2>::Output: Number,
+    <T as Pow2>::Output: Div<<T as Pow2>::Output>,
+    <<T as Pow2>::Output as Div<<T as Pow2>::Output>>::Output: Number,
+    T: Mul<<<T as Pow2>::Output as Div<<T as Pow2>::Output>>::Output, Output = T>,
 {
     pub fn projection_to_line(&self, other: &Line<T>) -> Point<T> {
         let v: Vector<_> = (other.point(), self).into();
@@ -570,8 +581,38 @@ where
     T: Number + AngleFactory,
     <T as HasValue>::Output: AngleOps,
 {
-    pub fn angle(&self, other: &Self) -> Radian<<T as HasValue>::Output> {
+    pub fn angle(&self) -> Radian<<T as HasValue>::Output> {
+        (self.y).atan2(self.x)
+    }
+}
+
+impl<T> Point<T>
+where
+    T: Number + AngleFactory,
+    <T as HasValue>::Output: AngleOps,
+{
+    pub fn angle_from_point(&self, other: &Self) -> Radian<<T as HasValue>::Output> {
         (other.y - self.y).atan2(other.x - self.x)
+    }
+}
+
+impl<T> Point<T>
+where
+    T: Number,
+    <T as HasValue>::Output: AngleOps,
+    //
+    T: Pow2,
+    T: Mul<T, Output = <T as Pow2>::Output>,
+    <T as Pow2>::Output: Number + AngleFactory,
+    <T as Pow2>::Output: HasValue<Output = <T as HasValue>::Output>,
+{
+    pub fn angle_from_points(a: &Self, b: &Self, c: &Self) -> Radian<<T as HasValue>::Output> {
+        let ba: Vector<_> = (b, a).into();
+        let bc: Vector<_> = (b, c).into();
+        let dp = ba.dot_product(&bc);
+        let cp = ba.cross_product(&bc);
+        let angle = cp.atan2(dp);
+        angle
     }
 }
 

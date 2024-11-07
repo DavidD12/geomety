@@ -2,6 +2,119 @@ use geomety::geometry2d::*;
 use sity::*;
 
 fn main() {
+    plot_path();
+}
+
+fn plot_path() {
+    let p1 = Point::new(metre(1.0), metre(0.0));
+    let p2 = Point::new(metre(4.0), metre(2.0));
+    let p3 = Point::new(metre(3.0), metre(4.0));
+    let p4 = Point::new(metre(1.0), metre(3.0));
+    let p5 = Point::new(metre(0.0), metre(1.0));
+    let points = vec![p1, p2, p3, p4, p5];
+    let p = Polygon::convex_hull(points).unwrap();
+    //
+    let radius = metre(0.15);
+    let distance = metre(0.5);
+    let map_direction = Vector::new(metre(1.0), metre(1.0));
+    let start = Pose::new(
+        Position::new(metre(4.0), metre(0.0)),
+        Vector::new(metre(0.0), metre(0.5)),
+    );
+
+    let segments = p.mapping(&map_direction, distance);
+    let point = p.mapping_first_point(&map_direction);
+    let path = Path::mapping(&start, &map_direction, radius, distance, &p).unwrap();
+
+    {
+        use plotters::prelude::*;
+        let root = BitMapBackend::new("geometrie.png", (1000, 1000)).into_drawing_area();
+        root.fill(&WHITE).unwrap();
+
+        let x_min = -1.0;
+        let x_max = 5.0;
+        let y_min = -1.0;
+        let y_max = 5.0;
+
+        let mut chart: ChartContext<
+            '_,
+            BitMapBackend<'_>,
+            Cartesian2d<
+                plotters::coord::types::RangedCoordf64,
+                plotters::coord::types::RangedCoordf64,
+            >,
+        > = ChartBuilder::on(&root)
+            // .caption("y=x^2", ("sans-serif", 50).into_font())
+            .margin(5)
+            .x_label_area_size(50)
+            .y_label_area_size(50)
+            .build_cartesian_2d(x_min..x_max, y_min..y_max)
+            .unwrap();
+        chart.configure_mesh().draw().unwrap();
+        //
+        p.draw(&mut chart, BLACK);
+        start.draw(&mut chart, RED, 5, RED.stroke_width(2));
+        for seg in segments.iter() {
+            seg.draw(&mut chart, RGBAColor(50, 50, 50, 0.5).stroke_width(10));
+        }
+        path.draw(&mut chart, BLUE.stroke_width(2));
+        point.draw(&mut chart, BLACK, 5);
+        //
+        root.present().unwrap();
+    }
+}
+
+fn plot_trajectory() {
+    let p = Point::new(metre(2.0), metre(7.0));
+    let v = Vector::new(metre(1.0), metre(1.0));
+    let start = Pose::new(p, v);
+    let p = Point::new(metre(7.0), metre(3.0));
+    let v = Vector::new(metre(-1.0), metre(0.0));
+    let finish = Pose::new(p, v);
+    let radius = metre(1.0);
+
+    let list = Trajectory::create_all(&start, &finish, radius);
+    let trajectory = Trajectory::create(&start, &finish, radius).unwrap();
+
+    {
+        use plotters::prelude::*;
+        let root = BitMapBackend::new("geometrie.png", (1000, 1000)).into_drawing_area();
+        root.fill(&WHITE).unwrap();
+
+        let x_min = 0.0;
+        let x_max = 10.0;
+        let y_min = 0.0;
+        let y_max = 10.0;
+
+        let mut chart: ChartContext<
+            // '_,
+            BitMapBackend<'_>,
+            Cartesian2d<
+                plotters::coord::types::RangedCoordf64,
+                plotters::coord::types::RangedCoordf64,
+            >,
+        > = ChartBuilder::on(&root)
+            // .caption("y=x^2", ("sans-serif", 50).into_font())
+            .margin(5)
+            .x_label_area_size(50)
+            .y_label_area_size(50)
+            .build_cartesian_2d(x_min..x_max, y_min..y_max)
+            .unwrap();
+        chart.configure_mesh().draw().unwrap();
+        //
+        start.draw(&mut chart, GREEN, 5, GREEN.stroke_width(2));
+        finish.draw(&mut chart, RED, 5, RED.stroke_width(2));
+
+        for traj in list.iter() {
+            traj.draw(&mut chart, RGBAColor(200, 200, 200, 1.0).stroke_width(2));
+        }
+        trajectory.draw(&mut chart, BLUE.stroke_width(2));
+        //
+        root.present().unwrap();
+    }
+}
+
+fn plot_test() {
     let radius = metre(0.5);
     let p1 = Point::new(metre(2.0), metre(1.0));
     let c1 = Circle::new(p1, radius);
@@ -12,9 +125,10 @@ fn main() {
 
     let p = Point::new(metre(0.0), metre(3.0));
     let c = Circle::new(p, metre(0.75));
+    let dc = DirectedCircle::new(c, Direction::CounterClockWise);
     let start_angle = Radian::new(0.0);
-    let finish_angle = Radian::new(f64::PI / 2.0);
-    let arc = DirectedArc::new(c, (start_angle, finish_angle));
+    let delta_angle = Degree::new(60.0).to_radians();
+    let arc = DirectedArc::new(dc, start_angle, delta_angle);
 
     let p = Point::new(metre(0.0), metre(3.0));
     let v = Vector::new(metre(0.5), metre(0.5));

@@ -49,8 +49,8 @@ where
         // Sort other points by angle with the first point
         points.sort_by(|a, b| {
             let order = first
-                .angle(a)
-                .partial_cmp(&first.angle(b))
+                .angle_from_point(a)
+                .partial_cmp(&first.angle_from_point(b))
                 .unwrap_or(Ordering::Equal);
             if order == Ordering::Equal {
                 first
@@ -335,22 +335,21 @@ where
 impl<T> Polygon<T>
 where
     T: Number,
-    // center
+    //
     <T as HasValue>::Output: FromValue<usize>,
-    T: DivAssign<<T as HasValue>::Output>,
-    // projection
-    T: Mul,
-    <T as Mul>::Output: Number,
-    T: Pow2<Output = <T as Mul>::Output>,
-    <T as Mul>::Output: Div,
-    <<T as Mul>::Output as Div>::Output: Number,
-    T: Mul<<<T as Mul>::Output as Div>::Output, Output = T>,
-    // Distance
-    <T as Pow2>::Output: Root2<Output = T>,
-    // Normalized
-    T: Div<<T as HasValue>::Output, Output = T>,
-    // Scale
+    //
     T: Mul<<T as HasValue>::Output, Output = T>,
+    T: Mul<T, Output = <T as Pow2>::Output>,
+    T: Mul<<<T as Pow2>::Output as Div>::Output, Output = T>,
+    //
+    T: Div<<T as HasValue>::Output, Output = T>,
+    T: DivAssign<<T as HasValue>::Output>,
+    //
+    T: Pow2,
+    <T as Pow2>::Output: Number,
+    <T as Pow2>::Output: Div,
+    <<T as Pow2>::Output as Div>::Output: Number,
+    <T as Pow2>::Output: Root2<Output = T>,
 {
     pub fn mapping_first_point(&self, direction: &Vector<T>) -> Point<T> {
         // Collinear segment
@@ -372,10 +371,10 @@ where
         let mut distance = list[0].distance(&list[1]);
         let mut point = first.clone();
         for pt in others.iter() {
-            let list = line.intersection_to_polygon(self);
+            let line = Line::new(pt.clone(), direction.clone());
             let list = line.intersection_to_polygon(self);
             if list.len() < 2 {
-                return first.clone();
+                return pt.clone();
             }
             let d = list[0].distance(&list[1]);
             if d < distance {

@@ -56,6 +56,23 @@ where
     }
 }
 
+//-------------------------------------------------- Reverse --------------------------------------------------
+
+impl<T> Segment<T>
+where
+    T: Number,
+{
+    pub fn reversed(&self) -> Self {
+        Self {
+            points: (self.points.1.clone(), self.points.0.clone()),
+        }
+    }
+
+    pub fn reverse(&mut self) {
+        self.points = (self.points.1.clone(), self.points.0.clone())
+    }
+}
+
 //-------------------------------------------------- Translate --------------------------------------------------
 
 impl<T> Segment<T>
@@ -327,7 +344,7 @@ where
     T: Pow2,
     <T as Pow2>::Output: Number,
 {
-    pub fn length2(self) -> <T as Pow2>::Output {
+    pub fn length2(&self) -> <T as Pow2>::Output {
         self.points.0.distance2(&self.points.1)
     }
 }
@@ -339,7 +356,7 @@ where
     <T as Pow2>::Output: Number,
     <T as Pow2>::Output: Root2<Output = T>,
 {
-    pub fn length(self) -> T {
+    pub fn length(&self) -> T {
         self.points.0.distance(&self.points.1)
     }
 }
@@ -408,8 +425,9 @@ where
 impl<T> IsParallel<Segment<T>> for Segment<T>
 where
     T: Number,
-    T: Mul,
-    <T as Mul>::Output: Number,
+    T: Pow2,
+    T: Mul<T, Output = <T as Pow2>::Output>,
+    <T as Pow2>::Output: Number,
 {
     fn is_parallel(&self, other: &Segment<T>) -> bool {
         let v1 = self.to_vector();
@@ -421,8 +439,9 @@ where
 impl<T> IsParallel<Line<T>> for Segment<T>
 where
     T: Number,
-    T: Mul,
-    <T as Mul>::Output: Number,
+    T: Pow2,
+    T: Mul<T, Output = <T as Pow2>::Output>,
+    <T as Pow2>::Output: Number,
 {
     fn is_parallel(&self, other: &Line<T>) -> bool {
         other.is_parallel(self)
@@ -434,11 +453,15 @@ where
 impl<T> Segment<T>
 where
     T: Number,
-    T: Mul,
-    <T as Mul>::Output: Number,
-    <T as Mul>::Output: Div,
-    <<T as Mul>::Output as Div>::Output: Number,
-    T: Mul<<<T as Mul>::Output as Div>::Output, Output = T>,
+    T: Pow2,
+    T: Mul<T, Output = <T as Pow2>::Output>,
+    <T as Pow2>::Output: Number,
+    <T as Pow2>::Output: Div,
+    <<T as Pow2>::Output as Div>::Output: Number,
+    T: Mul<<<T as Pow2>::Output as Div>::Output, Output = T>,
+    //
+    <T as Pow2>::Output: Root2<Output = T>,
+    <T as Mul>::Output: Div<T, Output = T>,
 {
     pub fn intersection_to_line(&self, other: &Line<T>) -> Option<Point<T>> {
         other.intersection_to_segment(self)
@@ -448,11 +471,15 @@ where
 impl<T> Segment<T>
 where
     T: Number,
-    T: Mul,
-    <T as Mul>::Output: Number,
-    <T as Mul>::Output: Div,
-    <<T as Mul>::Output as Div>::Output: Number,
-    T: Mul<<<T as Mul>::Output as Div>::Output, Output = T>,
+    T: Pow2,
+    T: Mul<T, Output = <T as Pow2>::Output>,
+    <T as Pow2>::Output: Number,
+    <T as Pow2>::Output: Div,
+    <<T as Pow2>::Output as Div>::Output: Number,
+    T: Mul<<<T as Pow2>::Output as Div>::Output, Output = T>,
+    //
+    <T as Pow2>::Output: Root2<Output = T>,
+    <T as Mul>::Output: Div<T, Output = T>,
 {
     pub fn intersection(&self, other: &Segment<T>) -> Option<Point<T>> {
         let self_v = self.to_vector();

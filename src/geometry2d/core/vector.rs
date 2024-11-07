@@ -26,6 +26,28 @@ impl<T: Number> From<(T, T)> for Vector<T> {
     }
 }
 
+impl<T> From<Point<T>> for Vector<T>
+where
+    T: Number,
+{
+    fn from(point: Point<T>) -> Self {
+        let dx = point.x;
+        let dy = point.y;
+        Vector::new(dx, dy)
+    }
+}
+
+impl<T> From<&Point<T>> for Vector<T>
+where
+    T: Number,
+{
+    fn from(point: &Point<T>) -> Self {
+        let dx = point.x;
+        let dy = point.y;
+        Vector::new(dx, dy)
+    }
+}
+
 impl<T> From<(&Point<T>, &Point<T>)> for Vector<T>
 where
     T: Number,
@@ -588,10 +610,11 @@ where
 impl<T> Vector<T>
 where
     T: Number,
-    T: Mul,
-    <T as Mul>::Output: Number,
+    T: Pow2,
+    T: Mul<T, Output = <T as Pow2>::Output>,
+    <T as Pow2>::Output: Number,
 {
-    pub fn dot_product(&self, other: &Self) -> <<T as Mul>::Output as Add>::Output {
+    pub fn dot_product(&self, other: &Self) -> <T as Pow2>::Output {
         self.dx * other.dx + self.dy * other.dy
     }
 }
@@ -599,10 +622,11 @@ where
 impl<T> Vector<T>
 where
     T: Number,
-    T: Mul,
-    <T as Mul>::Output: Number,
+    T: Pow2,
+    T: Mul<T, Output = <T as Pow2>::Output>,
+    <T as Pow2>::Output: Number,
 {
-    pub fn cross_product(&self, other: &Self) -> <<T as Mul>::Output as Sub>::Output {
+    pub fn cross_product(&self, other: &Self) -> <T as Pow2>::Output {
         self.dx * other.dy - self.dy * other.dx
     }
 }
@@ -612,12 +636,12 @@ where
 impl<T> IsParallel<Vector<T>> for Vector<T>
 where
     T: Number,
-    // cros product
-    T: Mul,
-    <T as Mul>::Output: Number,
+    T: Pow2,
+    T: Mul<T, Output = <T as Pow2>::Output>,
+    <T as Pow2>::Output: Number,
 {
     fn is_parallel(&self, other: &Vector<T>) -> bool {
-        self.cross_product(other).abs() <= <<T as Mul>::Output as Sub>::Output::EPSILON
+        self.cross_product(other).abs() <= <T as Pow2>::Output::EPSILON
     }
 }
 

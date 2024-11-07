@@ -34,6 +34,9 @@ pub use pose::*;
 pub mod trajectory;
 pub use trajectory::*;
 
+pub mod path;
+pub use path::*;
+
 pub mod plot;
 // pub use plot::*;
 

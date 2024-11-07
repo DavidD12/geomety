@@ -9,11 +9,9 @@ where
     T: Number,
     <T as HasValue>::Output: AngleOps,
 {
-    circle: Circle<T>,
-    angles: (
-        Radian<<T as HasValue>::Output>,
-        Radian<<T as HasValue>::Output>,
-    ),
+    circle: DirectedCircle<T>,
+    start_angle: Radian<<T as HasValue>::Output>,
+    delta_angle: Radian<<T as HasValue>::Output>,
 }
 
 //-------------------------------------------------- New --------------------------------------------------
@@ -24,37 +22,47 @@ where
     <T as HasValue>::Output: AngleOps,
 {
     pub fn new(
-        circle: Circle<T>,
-        angles: (
-            Radian<<T as HasValue>::Output>,
-            Radian<<T as HasValue>::Output>,
-        ),
+        circle: DirectedCircle<T>,
+        start_angle: Radian<<T as HasValue>::Output>,
+        delta_angle: Radian<<T as HasValue>::Output>,
     ) -> Self {
-        Self { circle, angles }
+        Self {
+            circle,
+            start_angle,
+            delta_angle,
+        }
     }
 
-    pub fn circle(&self) -> &Circle<T> {
+    pub fn circle(&self) -> &DirectedCircle<T> {
         &self.circle
     }
 
+    pub fn center(&self) -> &Point<T> {
+        self.circle.center()
+    }
+
+    pub fn radius(&self) -> T {
+        self.circle.radius()
+    }
+
     pub fn start_angle(&self) -> Radian<<T as HasValue>::Output> {
-        self.angles.0
+        self.start_angle
+    }
+
+    pub fn delta_angle(&self) -> Radian<<T as HasValue>::Output> {
+        self.delta_angle
     }
 
     pub fn finish_angle(&self) -> Radian<<T as HasValue>::Output> {
-        self.angles.1
-    }
-
-    pub fn angle(&self) -> Radian<<T as HasValue>::Output> {
-        self.angles.1 - self.angles.0
+        if self.direction() == Direction::CounterClockWise {
+            self.start_angle + self.delta_angle
+        } else {
+            self.start_angle - self.delta_angle
+        }
     }
 
     pub fn direction(&self) -> Direction {
-        if self.start_angle() <= self.finish_angle() {
-            Direction::CounterClockWise
-        } else {
-            Direction::ClockWise
-        }
+        self.circle.direction()
     }
 
     pub fn start_point(&self) -> Point<T>
@@ -76,6 +84,36 @@ where
     }
 }
 
+//-------------------------------------------------- From/Into --------------------------------------------------
+
+impl<T>
+    From<(
+        Circle<T>,
+        Direction,
+        Radian<<T as HasValue>::Output>,
+        Radian<<T as HasValue>::Output>,
+    )> for DirectedArc<T>
+where
+    T: Number,
+    <T as HasValue>::Output: AngleOps,
+{
+    fn from(
+        value: (
+            Circle<T>,
+            Direction,
+            Radian<<T as HasValue>::Output>,
+            Radian<<T as HasValue>::Output>,
+        ),
+    ) -> Self {
+        let circle = DirectedCircle::new(value.0, value.1);
+        Self {
+            circle,
+            start_angle: value.2,
+            delta_angle: value.3,
+        }
+    }
+}
+
 //-------------------------------------------------- ToValue --------------------------------------------------
 
 impl<T> DirectedArc<T>
@@ -84,7 +122,7 @@ where
     <T as HasValue>::Output: AngleOps,
 {
     pub fn to_value(&self) -> DirectedArc<<T as HasValue>::Output> {
-        DirectedArc::new(self.circle.to_value(), self.angles)
+        DirectedArc::new(self.circle.to_value(), self.start_angle, self.delta_angle)
     }
 }
 
@@ -102,8 +140,22 @@ where
     pub fn translated(&self, dx: T, dy: T) -> Self {
         Self {
             circle: self.circle.translated(dx, dy),
-            angles: self.angles,
+            start_angle: self.start_angle,
+            delta_angle: self.delta_angle,
         }
+    }
+}
+
+//-------------------------------------------------- Length --------------------------------------------------
+
+impl<T> DirectedArc<T>
+where
+    T: Number,
+    <T as HasValue>::Output: AngleOps,
+    T: Mul<<T as HasValue>::Output, Output = T>,
+{
+    pub fn length(&self) -> T {
+        self.radius() * self.delta_angle().value()
     }
 }
 
@@ -121,7 +173,8 @@ where
     fn add(self, rhs: Vector<T>) -> Self::Output {
         Self::Output {
             circle: self.circle() + rhs,
-            angles: self.angles,
+            start_angle: self.start_angle,
+            delta_angle: self.delta_angle,
         }
     }
 }
@@ -136,7 +189,8 @@ where
     fn add(self, rhs: Vector<T>) -> Self::Output {
         Self::Output {
             circle: self.circle() + rhs,
-            angles: self.angles,
+            start_angle: self.start_angle,
+            delta_angle: self.delta_angle,
         }
     }
 }
@@ -151,7 +205,8 @@ where
     fn add(self, rhs: &Vector<T>) -> Self::Output {
         Self::Output {
             circle: self.circle() + rhs,
-            angles: self.angles,
+            start_angle: self.start_angle,
+            delta_angle: self.delta_angle,
         }
     }
 }
@@ -166,7 +221,8 @@ where
     fn add(self, rhs: &Vector<T>) -> Self::Output {
         Self::Output {
             circle: self.circle() + rhs,
-            angles: self.angles,
+            start_angle: self.start_angle,
+            delta_angle: self.delta_angle,
         }
     }
 }
@@ -183,7 +239,8 @@ where
     fn sub(self, rhs: Vector<T>) -> Self::Output {
         Self::Output {
             circle: self.circle() - rhs,
-            angles: self.angles,
+            start_angle: self.start_angle,
+            delta_angle: self.delta_angle,
         }
     }
 }
@@ -198,7 +255,8 @@ where
     fn sub(self, rhs: Vector<T>) -> Self::Output {
         Self::Output {
             circle: self.circle() - rhs,
-            angles: self.angles,
+            start_angle: self.start_angle,
+            delta_angle: self.delta_angle,
         }
     }
 }
@@ -213,7 +271,8 @@ where
     fn sub(self, rhs: &Vector<T>) -> Self::Output {
         Self::Output {
             circle: self.circle() - rhs,
-            angles: self.angles,
+            start_angle: self.start_angle,
+            delta_angle: self.delta_angle,
         }
     }
 }
@@ -228,7 +287,8 @@ where
     fn sub(self, rhs: &Vector<T>) -> Self::Output {
         Self::Output {
             circle: self.circle() - rhs,
-            angles: self.angles,
+            start_angle: self.start_angle,
+            delta_angle: self.delta_angle,
         }
     }
 }
@@ -244,7 +304,9 @@ where
         write!(
             f,
             "DirectedArc({}, ({}, {}))",
-            self.circle, self.angles.0, self.angles.1
+            self.circle,
+            self.start_angle.to_degrees(),
+            self.delta_angle.to_degrees()
         )
     }
 }
