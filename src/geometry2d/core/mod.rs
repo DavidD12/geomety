@@ -37,6 +37,9 @@ pub use trajectory::*;
 pub mod path;
 pub use path::*;
 
+pub mod follow;
+pub use follow::*;
+
 pub mod plot;
 // pub use plot::*;
 

@@ -200,6 +200,28 @@ where
 
 //-------------------------------------------------- Tangent --------------------------------------------------
 
+//-------------------------------------------------- Tangent --------------------------------------------------
+
+impl<T> DirectedCircle<T>
+where
+    T: Number,
+    T: Neg<Output = T>,
+    T: Mul<<T as HasValue>::Output, Output = T>,
+    //
+    <T as HasValue>::Output: AngleOps,
+{
+    pub fn tangent(&self, angle: Radian<<T as HasValue>::Output>) -> Vector<T> {
+        let x = T::ONE * angle.cos();
+        let y = T::ONE * angle.sin();
+        let v = Vector::new(x, y);
+        if self.direction == Direction::ClockWise {
+            v.perpendicular_clockwise()
+        } else {
+            v.perpendicular_counterclockwise()
+        }
+    }
+}
+
 impl<T> DirectedCircle<T>
 where
     // distance

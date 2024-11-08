@@ -22,9 +22,24 @@ fn plot_path() {
         Vector::new(metre(0.0), metre(0.5)),
     );
 
-    let segments = p.mapping(&map_direction, distance);
-    let point = p.mapping_first_point(&map_direction);
+    // let segments = p.mapping(&map_direction, distance);
+    // let point = p.mapping_first_point(&map_direction);
     let path = Path::mapping(&start, &map_direction, radius, distance, &p).unwrap();
+    println!("length = {}", path.length());
+
+    let path = Path::optimal_mapping(&start, radius, distance, &p).unwrap();
+    let traj = path.trajectories().get(0).unwrap();
+
+    let velocity = metre(1.0) / second(1.0);
+    let duration = second(2.5);
+    let res = path.follow(velocity, duration);
+
+    let traj_res = traj.segment().follow(velocity, duration);
+    println!(
+        "{} {:?}",
+        traj_res.pose,
+        traj_res.complete.map(|x| x.value())
+    );
 
     {
         use plotters::prelude::*;
@@ -54,11 +69,12 @@ fn plot_path() {
         //
         p.draw(&mut chart, BLACK);
         start.draw(&mut chart, RED, 5, RED.stroke_width(2));
-        for seg in segments.iter() {
-            seg.draw(&mut chart, RGBAColor(50, 50, 50, 0.5).stroke_width(10));
-        }
+        // for seg in segments.iter() {
+        //     seg.draw(&mut chart, RGBAColor(50, 50, 50, 0.5).stroke_width(10));
+        // }
         path.draw(&mut chart, BLUE.stroke_width(2));
-        point.draw(&mut chart, BLACK, 5);
+        // point.draw(&mut chart, BLACK, 5);
+        res.pose.draw(&mut chart, BLUE, 5, BLUE);
         //
         root.present().unwrap();
     }

@@ -457,12 +457,6 @@ where
     T: Mul<<<T as Mul>::Output as Div>::Output, Output = T>,
 {
     fn distance(&self, other: &Segment<T>) -> T {
-        // match self.projection_to_segment(other) {
-        //     Some(pt) => self.distance(&pt),
-        //     None => self
-        //         .distance(&other.first())
-        //         .min(self.distance(&other.second())),
-        // }
         let v: Vector<_> = (other.first(), self).into();
         let seg_v = other.to_vector();
         let dp = v.dot_product(&seg_v);

@@ -1,5 +1,4 @@
 use super::*;
-use std::fmt::Display;
 use std::ops::{Div, DivAssign, Mul};
 
 use sity::*;
@@ -200,5 +199,30 @@ where
         }
         // Find complete trajectory
         Self::create(radius, &poses)
+    }
+
+    pub fn optimal_mapping(
+        start: &Pose<T>,
+        radius: T,
+        distance: T,
+        polygon: &Polygon<T>,
+    ) -> Option<Self> {
+        let mut length = T::ZERO;
+        let mut path = None;
+        for seg in polygon.segments() {
+            let direction = seg.to_vector();
+            match Self::mapping(start, &direction, radius, distance, polygon) {
+                Some(p) => {
+                    let l = p.length();
+                    if path.is_none() || l < length {
+                        length = l;
+                        path = Some(p);
+                    }
+                }
+                None => {}
+            }
+        }
+
+        path
     }
 }
