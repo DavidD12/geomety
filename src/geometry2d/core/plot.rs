@@ -212,13 +212,14 @@ where
         point_color: RGBColor,
         point_size: i32,
         line_style: S,
+        line_length: f64,
     ) {
         let pose = self.to_value();
 
         pose.position().draw(chart, point_color, point_size);
 
         let point1 = pose.position().into();
-        let point2 = (pose.position() + pose.orientation()).into();
+        let point2 = (pose.position() + pose.orientation().scale(line_length)).into();
 
         chart
             .draw_series(LineSeries::new(vec![point1, point2], line_style))

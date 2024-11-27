@@ -1,6 +1,5 @@
 use std::cmp::Ordering;
 use std::ops::*;
-use std::process::Output;
 
 use super::*;
 use sity::*;

@@ -16,18 +16,18 @@ fn plot_path() {
     //
     let radius = metre(0.15);
     let distance = metre(0.5);
-    let map_direction = Vector::new(metre(1.0), metre(1.0));
+    let map_direction = Vector::new(metre(1.0), metre(0.0));
     let start = Pose::new(
-        Position::new(metre(4.0), metre(0.0)),
+        Point::new(metre(4.0), metre(0.0)),
         Vector::new(metre(0.0), metre(0.5)),
     );
 
     // let segments = p.mapping(&map_direction, distance);
     // let point = p.mapping_first_point(&map_direction);
-    let path = Path::mapping(&start, &map_direction, radius, distance, &p).unwrap();
-    println!("length = {}", path.length());
-
+    // let path = Path::mapping(&start, &map_direction, radius, distance, &p).unwrap();
     let path = Path::optimal_mapping(&start, radius, distance, &p).unwrap();
+
+    println!("length = {}", path.length());
     let traj = path.trajectories().get(0).unwrap();
 
     let velocity = metre(1.0) / second(1.0);
@@ -68,13 +68,13 @@ fn plot_path() {
         chart.configure_mesh().draw().unwrap();
         //
         p.draw(&mut chart, BLACK);
-        start.draw(&mut chart, RED, 5, RED.stroke_width(2));
+        start.draw(&mut chart, RED, 5, RED.stroke_width(2), 1.0);
         // for seg in segments.iter() {
         //     seg.draw(&mut chart, RGBAColor(50, 50, 50, 0.5).stroke_width(10));
         // }
         path.draw(&mut chart, BLUE.stroke_width(2));
         // point.draw(&mut chart, BLACK, 5);
-        res.pose.draw(&mut chart, BLUE, 5, BLUE);
+        res.pose.draw(&mut chart, BLUE, 5, BLUE, 1.0);
         //
         root.present().unwrap();
     }
@@ -118,8 +118,8 @@ fn plot_trajectory() {
             .unwrap();
         chart.configure_mesh().draw().unwrap();
         //
-        start.draw(&mut chart, GREEN, 5, GREEN.stroke_width(2));
-        finish.draw(&mut chart, RED, 5, RED.stroke_width(2));
+        start.draw(&mut chart, GREEN, 5, GREEN.stroke_width(2), 1.0);
+        finish.draw(&mut chart, RED, 5, RED.stroke_width(2), 1.0);
 
         for traj in list.iter() {
             traj.draw(&mut chart, RGBAColor(200, 200, 200, 1.0).stroke_width(2));
@@ -182,7 +182,7 @@ fn plot_test() {
         arc.draw(&mut chart, RED.stroke_width(2));
         arc.start_point().draw(&mut chart, BLACK, 5);
         arc.finish_point().draw(&mut chart, GREEN, 5);
-        pose.draw(&mut chart, GREEN, 5, GREEN.stroke_width(2));
+        pose.draw(&mut chart, GREEN, 5, GREEN.stroke_width(2), 5.0);
         //
         root.present().unwrap();
     }
