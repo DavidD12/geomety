@@ -1,6 +1,5 @@
 use super::*;
 use sity::*;
-use std::collections::HashMap;
 use std::fmt::Display;
 use std::ops::{Add, Div, Mul, Sub};
 

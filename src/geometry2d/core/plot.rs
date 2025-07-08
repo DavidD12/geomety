@@ -1,25 +1,9 @@
 use super::{
-    point, Circle as GCircle, DirectedArc, Direction, Path, Point, Polygon, Pose, Segment,
-    Trajectory,
+    Circle as GCircle, DirectedArc, Direction, Path, Point, Polygon, Pose, Segment, Trajectory,
 };
 use sity::*;
 
 use plotters::prelude::*;
-
-// pub trait Plot {
-//     fn draw(
-//         &self,
-//         chart: &mut ChartContext<
-//             '_,
-//             BitMapBackend<'_>,
-//             Cartesian2d<
-//                 plotters::coord::types::RangedCoordf64,
-//                 plotters::coord::types::RangedCoordf64,
-//             >,
-//         >,
-//         color: RGBColor,
-//     );
-// }
 
 //-------------------------------------------------- Point --------------------------------------------------
 
@@ -113,7 +97,7 @@ where
         let arc = self.to_value();
         let nb_points = 1000;
         let mut angle = arc.delta_angle().value();
-        let mut start_angle = arc.start_angle().value();
+        let start_angle = arc.start_angle().value();
         if angle < 0.0 {
             angle += f64::PI * 2.0;
         }

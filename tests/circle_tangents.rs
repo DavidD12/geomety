@@ -1,6 +1,6 @@
 #[cfg(test)]
 mod tests {
-    use geomety::geometry2d::*;
+    // use geomety::geometry2d::*;
 
     // #[test]
     // fn test_circle_tangents() {

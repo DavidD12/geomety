@@ -1,7 +1,7 @@
 use super::*;
 use sity::*;
 use std::fmt::Display;
-use std::ops::{Add, Div, Mul, Sub};
+use std::ops::{Add, Sub};
 
 #[derive(Debug, Clone, PartialEq, Default)]
 pub struct Pose<T: Number> {
