@@ -1,9 +1,13 @@
 use super::*;
 
+/// Represents the orientation of three points in 2D space.
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub enum Orientation {
+    /// All three points are collinear.
     Collinear,
+    /// The points are oriented in a clockwise direction.
     ClockWise,
+    /// The points are oriented in a counter-clockwise direction.
     CounterClockWise,
 }
 

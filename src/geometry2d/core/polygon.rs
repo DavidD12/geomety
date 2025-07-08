@@ -3,8 +3,12 @@ use std::ops::*;
 
 use super::*;
 use sity::*;
+
+/// A 2D polygon represented by a list of points (vertices).
+/// The points are stored in order, and the polygon is assumed to be closed (last point connects to the first).
 #[derive(Debug, Clone, PartialEq, Default)]
 pub struct Polygon<T: Number> {
+    /// The vertices of the polygon, in order.
     points: Vec<Point<T>>,
 }
 

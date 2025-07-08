@@ -3,9 +3,15 @@ use sity::*;
 use std::fmt::Display;
 use std::ops::{Add, Div, Mul, Sub};
 
+/// A 2D point with generic numeric coordinates.
+///
+/// # Type Parameters
+/// - `T`: The numeric type for the coordinates. Must implement the `Number` trait.
 #[derive(Debug, Clone, PartialEq, Default)]
 pub struct Point<T: Number> {
+    /// The x-coordinate of the point.
     pub x: T,
+    /// The y-coordinate of the point.
     pub y: T,
 }
 

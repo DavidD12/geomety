@@ -3,12 +3,17 @@ use std::ops::{Div, DivAssign, Mul};
 
 use sity::*;
 
+/// Represents a path composed of multiple trajectories in 2D geometry.
+///
+/// # Type Parameters
+/// * `T` - A numeric type that implements `Number` and whose value type implements `AngleOps`.
 #[derive(Debug, Clone, PartialEq, Default)]
 pub struct Path<T>
 where
     T: Number,
     <T as HasValue>::Output: AngleOps,
 {
+    /// The list of trajectories that make up the path.
     trajectories: Vec<Trajectory<T>>,
 }
 

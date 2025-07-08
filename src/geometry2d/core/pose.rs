@@ -3,9 +3,15 @@ use sity::*;
 use std::fmt::Display;
 use std::ops::{Add, Sub};
 
+/// Represents a 2D pose with a position and orientation.
+///
+/// # Type Parameters
+/// - `T`: Numeric type implementing the `Number` trait.
 #[derive(Debug, Clone, PartialEq, Default)]
 pub struct Pose<T: Number> {
+    /// The position of the pose as a 2D point.
     position: Point<T>,
+    /// The orientation of the pose as a 2D vector.
     orientation: Vector<T>,
 }
 

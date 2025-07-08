@@ -4,9 +4,14 @@ use std::ops::{Add, Div, DivAssign, Mul, Sub};
 
 use sity::*;
 
+/// A 2D vector with generic numeric type.
+///
+/// Represents a vector in 2D space with components `dx` and `dy`.
 #[derive(Debug, Clone, PartialEq, Default)]
 pub struct Vector<T: Number> {
+    /// The x-component of the vector.
     pub dx: T,
+    /// The y-component of the vector.
     pub dy: T,
 }
 

@@ -1,6 +1,9 @@
+/// Represents the direction of rotation in 2D geometry.
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub enum Direction {
+    /// Rotation in the clockwise direction.
     ClockWise,
+    /// Rotation in the counter-clockwise direction.
     CounterClockWise,
 }
 

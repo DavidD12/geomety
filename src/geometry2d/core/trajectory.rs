@@ -4,16 +4,25 @@ use std::ops::{Div, DivAssign, Mul};
 
 use sity::*;
 
+/// Represents a 2D trajectory consisting of two arcs (start and finish rotations)
+/// connected by a straight segment. The trajectory starts at `start` pose,
+/// follows an arc (`start_rotation`), then a straight segment (`segment`),
+/// then another arc (`finish_rotation`), and ends at `finish` pose.
 #[derive(Debug, Clone, PartialEq, Default)]
 pub struct Trajectory<T>
 where
     T: Number,
     <T as HasValue>::Output: AngleOps,
 {
+    /// The starting pose of the trajectory.
     start: Pose<T>,
+    /// The arc representing the initial rotation from the start pose.
     start_rotation: DirectedArc<T>,
+    /// The straight segment connecting the two arcs.
     segment: Segment<T>,
+    /// The arc representing the final rotation to the finish pose.
     finish_rotation: DirectedArc<T>,
+    /// The ending pose of the trajectory.
     finish: Pose<T>,
 }
 

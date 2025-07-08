@@ -4,9 +4,12 @@ use sity::*;
 use std::fmt::Display;
 use std::ops::*;
 
+/// A circle with an associated direction (clockwise or counterclockwise).
 #[derive(Debug, Clone, PartialEq, Default)]
 pub struct DirectedCircle<T: Number> {
+    /// The underlying circle geometry.
     circle: Circle<T>,
+    /// The direction of the circle (clockwise or counterclockwise).
     direction: Direction,
 }
 

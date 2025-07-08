@@ -3,8 +3,13 @@ use sity::*;
 use std::fmt::Display;
 use std::ops::{Add, Div, Mul, Sub};
 
+/// A 2D line segment defined by two endpoints.
+///
+/// The segment is generic over the coordinate type `T`, which must implement the `Number` trait.
+/// The endpoints are stored as a tuple of two `Point<T>`.
 #[derive(Debug, Clone, PartialEq, Default)]
 pub struct Segment<T: Number> {
+    /// The two endpoints of the segment.
     points: (Point<T>, Point<T>),
 }
 

@@ -3,6 +3,7 @@ use sity::*;
 use std::fmt::Display;
 use std::ops::*;
 
+/// A 2D circle defined by a center point and a radius.
 #[derive(Debug, Clone, PartialEq, Default)]
 pub struct Circle<T: Number> {
     center: Point<T>,

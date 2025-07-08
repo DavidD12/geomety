@@ -3,14 +3,23 @@ use sity::*;
 use std::fmt::Display;
 use std::ops::*;
 
+/// A directed arc on a circle, defined by a center, radius, direction, start angle, and delta angle.
+///
+/// - `circle`: The underlying directed circle (center, radius, direction).
+/// - `start_angle`: The angle (in radians) where the arc starts, relative to the circle's center.
+/// - `delta_angle`: The angle (in radians) the arc sweeps from the start angle. The sign and value
+///    of `delta_angle` together with the direction determine the arc's extent.
 #[derive(Debug, Clone, PartialEq, Default)]
 pub struct DirectedArc<T>
 where
     T: Number,
     <T as HasValue>::Output: AngleOps,
 {
+    /// The underlying directed circle (center, radius, direction).
     circle: DirectedCircle<T>,
+    /// The angle (in radians) where the arc starts.
     start_angle: Radian<<T as HasValue>::Output>,
+    /// The angle (in radians) the arc sweeps from the start angle.
     delta_angle: Radian<<T as HasValue>::Output>,
 }
 

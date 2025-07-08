@@ -3,9 +3,16 @@ use sity::*;
 use std::fmt::Display;
 use std::ops::{Add, Div, Mul, Sub};
 
+/// A 2D line defined by a point and a direction vector.
+///
+/// The line is represented parametrically as:
+///     L(t) = point + t * vector
+/// where `point` is a point on the line and `vector` is the direction.
 #[derive(Debug, Clone, PartialEq, Default)]
 pub struct Line<T: Number> {
+    /// A point on the line.
     point: Point<T>,
+    /// The direction vector of the line.
     vector: Vector<T>,
 }
 
